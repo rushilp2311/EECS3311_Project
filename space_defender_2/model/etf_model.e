@@ -20,20 +20,14 @@ feature {NONE} -- Initialization
 	make
 			-- Initialization for `Current'.
 		do
-			create s.make_empty
-			i := 0
+			in_game :=false
 		end
 
 feature -- model attributes
-	s : STRING
-	i : INTEGER
+	in_game:BOOLEAN
 
 feature -- model operations
-	default_update
-			-- Perform update to the model state.
-		do
-			i := i + 1
-		end
+
 
 	reset
 			-- Reset model state.
@@ -45,10 +39,7 @@ feature -- queries
 	out : STRING
 		do
 			create Result.make_from_string ("  ")
-			Result.append ("System State: default model state ")
-			Result.append ("(")
-			Result.append (i.out)
-			Result.append (")")
+			Result.append("%N  Welcome to Space Defender Version 2.")
 		end
 
 end
