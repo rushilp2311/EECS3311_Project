@@ -23,6 +23,9 @@ feature
 			projectile_cost := 0
 			create choice_selected.make_empty
 			choice_selected.force ([1,"Starfighter"], choice_selected.count+1)
+			choice_selected.force ([1,"None"], choice_selected.count+1)
+			choice_selected.force ([1,"Starfighter"], choice_selected.count+1)
+			choice_selected.force ([1,"1:Recall (50 energy): Teleport back to spawn."], choice_selected.count+1)
 		end
 
 feature --attributes

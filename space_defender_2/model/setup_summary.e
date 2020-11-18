@@ -11,9 +11,12 @@ inherit
 create
 	make
 feature
+	model :ETF_MODEL
+
+feature
 	make
 		do
-
+			model := model_access.m
 		end
 feature
 	select_choice(choice:INTEGER)
