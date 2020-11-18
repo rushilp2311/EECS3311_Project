@@ -16,7 +16,8 @@ feature -- command
 			setup_select_precond(value)
     	do
 			-- perform some update on the model state
-
+			model.setup_array[model.cursor].select_choice (value)
+			model.set_output_msg (model.setup_array[model.cursor].output)
 			etf_cmd_container.on_change.notify ([Current])
     	end
 

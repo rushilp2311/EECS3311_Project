@@ -16,7 +16,9 @@ feature -- command
 			setup_next_precond(state)
     	do
 			-- perform some update on the model state
-
+			-- TODO validaton
+			model.set_cursor_next (state)
+			model.set_output_msg (model.setup_array[model.cursor].output)
 			etf_cmd_container.on_change.notify ([Current])
     	end
 
