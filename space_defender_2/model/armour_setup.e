@@ -20,12 +20,66 @@ feature
 		end
 feature
 	select_choice(choice:INTEGER)
+	local
+		ship : STARFIGHTER
 		do
+			ship := model.ship_array[2]
+			inspect choice
+
+			when 2 then
+				ship.health := 75
+				ship.energy := 0
+				ship.h_regen := 2
+				ship.e_regen := 0
+				ship.armour := 3
+				ship.vision := 0
+				ship.move := 0
+				ship.move_cost := 1
+				model.ship.choice_selected[2].pos := 2
+				model.ship.choice_selected[2].name := "Light"
+			when 3 then
+				ship.health := 100
+				ship.energy := 0
+				ship.h_regen := 13
+				ship.e_regen := 0
+				ship.armour := 5
+				ship.vision := 0
+				ship.move := 0
+				ship.move_cost := 3
+				model.ship.choice_selected[2].pos := 3
+				model.ship.choice_selected[2].name := "Medium"
+			when 4 then
+				ship.health := 200
+				ship.energy := 0
+				ship.h_regen := 4
+				ship.e_regen := 0
+				ship.armour := 10
+				ship.vision := 0
+				ship.move := -1
+				ship.move_cost := 5
+				model.ship.choice_selected[2].pos := 4
+				model.ship.choice_selected[2].name := "Heavy"
+			else
+				ship.health := 50
+				ship.energy := 0
+				ship.h_regen := 1
+				ship.e_regen := 0
+				ship.armour := 0
+				ship.vision := 0
+				ship.move := 1
+				ship.move_cost := 0
+				model.ship.choice_selected[2].pos := 1
+				model.ship.choice_selected[2].name := "None"
+			end
 
 		end
-	check_range(range:INTEGER)
+	in_range(range:INTEGER):BOOLEAN
 		do
-
+			if range < 1 or range > 4 then
+				Result := false
+			else
+				Result := true
+			end
 		end
 	output:STRING
 		do

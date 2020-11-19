@@ -28,9 +28,10 @@ feature {NONE} -- Initialization
 			i_threshold := 0
 			p_threshold := 0
 			in_setup := false
+			in_game := false
 			cursor := 0
 			debug_mode:=false
-
+			is_error:=false
 			create state_name.make_empty
 			create state_type.make_empty
 			create state_indicate.make_empty
@@ -54,11 +55,13 @@ feature -- model attributes
 	i_threshold:INTEGER
 	p_threshold:INTEGER
 	in_setup:BOOLEAN
+	in_game:BOOLEAN
 	cursor:INTEGER
 	debug_mode:BOOLEAN
 
 	state_name:STRING
 	error:ERROR
+	is_error : BOOLEAN
 	output_msg:STRING
 	state_type:STRING
 	state_indicate:STRING
@@ -79,14 +82,26 @@ feature --utility operations
 		do
 			in_setup := not in_setup
 		end
-
-	set_error
+	toggle_in_game
 		do
-			state_indicate := "error"
+			in_game := not in_game
 		end
-	set_success
+	toggle_is_error
 		do
-			state_indicate := "ok"
+			is_error := not is_error
+		end
+
+
+
+
+	set_indicate
+		do
+			if is_error then
+				state_indicate := "error"
+			else
+				state_indicate := "ok"
+			end
+
 		end
 
 	set_state_type
@@ -102,12 +117,20 @@ feature --utility operations
 			output_msg := "  state:"+state_name +", "+state_type+", "+state_indicate
 		end
 
-	set_output_msg(s:STRING)
+	set_success_output_msg(s:STRING)
 		do
+			output_msg.make_empty
 			set_state_type
-				set_success
+				set_indicate
 				set_state
 			output_msg.append ("%N"+s)
+		end
+	set_error_output_msg(s:STRING)
+		do
+			set_state_type
+			set_indicate
+			set_state
+			output_msg.append ("%N  "+s)
 		end
 
 	set_state_items
@@ -143,7 +166,7 @@ feature --utility operations
 
 			from i := 1
 			until
-				i > 5
+				i >5
 			loop
 				ship_array.force (create {STARFIGHTER}.make, i)
 				i:=i+1
@@ -180,8 +203,22 @@ feature --utility operations
 feature -- model operations
 
 	play
+	local
+		s :STRING
 		do
+			create s.make_empty
+			across 1 |..| ship_array.count as sa
+			loop
+				ship.health := ship.health + ship_array[sa.item].health
+				ship.energy := ship.energy + ship_array[sa.item].energy
+				ship.h_regen := ship.h_regen + ship_array[sa.item].h_regen
+				ship.e_regen := ship.e_regen + ship_array[sa.item].e_regen
+				ship.armour := ship.armour + ship_array[sa.item].armour
+				ship.vision := ship.vision + ship_array[sa.item].vision
+				ship.move := ship.move + ship_array[sa.item].move
+				ship.move_cost := ship.move_cost + ship_array[sa.item].move_cost
 
+			end
 		end
 
 
@@ -197,7 +234,7 @@ feature -- queries
 			create Result.make_empty
 			if cursor = 0 then
 				set_state_type
-				set_success
+				set_indicate
 				set_state
 				Result.append(output_msg)
 				Result.append("%N  Welcome to Space Defender Version 2.")

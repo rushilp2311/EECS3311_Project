@@ -12,7 +12,7 @@ feature
 	select_choice(choice:INTEGER)
 		deferred
 		end
-	check_range(range:INTEGER)
+	in_range(range:INTEGER):BOOLEAN
 		deferred
 		end
 	output:STRING

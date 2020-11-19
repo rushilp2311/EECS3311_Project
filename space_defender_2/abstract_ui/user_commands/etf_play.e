@@ -18,13 +18,14 @@ feature -- command
 			-- perform some update on the model state
 			if model.in_setup then
 				model.output_msg.append (model.error.play_in_game)
-				model.set_error
+				model.set_indicate
 			else
 				model.set_parameters (row, column, g_threshold, f_threshold, c_threshold, i_threshold, p_threshold)
 				model.increment_cursor
 				model.set_setup_array
 				model.toggle_in_setup
-				model.set_output_msg (model.setup_array[model.cursor].output)
+				model.setup_array[model.cursor].select_choice(model.ship.choice_selected[model.cursor].pos)
+				model.set_success_output_msg (model.setup_array[model.cursor].output)
 
 
 			end

@@ -21,23 +21,86 @@ feature
 		end
 feature
 	select_choice(choice:INTEGER)
+	local
+		ship : STARFIGHTER
 		do
+			ship := model.ship_array[1]
 			inspect choice
-			when 1 then
-				
-					model.ship.choice_selected[1].pos := 1
-					model.ship.choice_selected[1].name := "Starfighter"
-			when 2 then
-				model.ship.health := model.ship.health + 0
-				model.ship.choice_selected[1].pos := 2
-				model.ship.choice_selected[1].name := "Spread"
-			else
 
-			end
+					when 2 then
+						ship.health := 10
+						ship.energy := 60
+						ship.h_regen := 0
+						ship.e_regen := 2
+						ship.armour := 1
+						ship.vision := 0
+						ship.move := 0
+						ship.move_cost := 2
+						ship.projectile_damage := 50
+						ship.projectile_cost := 10
+						model.ship.choice_selected[1].pos := 2
+						model.ship.choice_selected[1].name := "Spread"
+					when 3 then
+						ship.health := 0
+						ship.energy := 100
+						ship.h_regen := 0
+						ship.e_regen := 5
+						ship.armour := 0
+						ship.vision := 10
+						ship.move := 3
+						ship.move_cost := 0
+						ship.projectile_damage := 1000
+						ship.projectile_cost := 20
+						model.ship.choice_selected[1].pos := 3
+						model.ship.choice_selected[1].name := "Snipe"
+					when 4 then
+						ship.health := 10
+						ship.energy := 0
+						ship.h_regen := 10
+						ship.e_regen := 0
+						ship.armour := 2
+						ship.vision := 2
+						ship.move := 0
+						ship.move_cost := 3
+						ship.projectile_damage := 100
+						ship.projectile_cost := 10
+						model.ship.choice_selected[1].pos := 4
+						model.ship.choice_selected[1].name := "Rocket"
+					when 5 then
+						ship.health := 0
+						ship.energy := 100
+						ship.h_regen := 0
+						ship.e_regen := 10
+						ship.armour := 0
+						ship.vision := 0
+						ship.move := 0
+						ship.move_cost := 5
+						ship.projectile_damage := 150
+						ship.projectile_cost := 70
+						model.ship.choice_selected[1].pos := 5
+						model.ship.choice_selected[1].name := "Splitter"
+					else
+						ship.health := 0
+						ship.energy := 10
+						ship.h_regen := 0
+						ship.e_regen := 1
+						ship.armour := 0
+						ship.vision := 1
+						ship.move := 1
+						ship.move_cost := 1
+						ship.projectile_damage := 70
+						ship.projectile_cost := 5
+						model.ship.choice_selected[1].pos := 1
+						model.ship.choice_selected[1].name := "Standard"
+					end
 		end
-	check_range(range:INTEGER)
+	in_range(range:INTEGER):BOOLEAN
 		do
-
+			if range < 1 or range > 5 then
+				Result := false
+			else
+				Result := true
+			end
 		end
 	output:STRING
 		do

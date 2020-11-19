@@ -22,9 +22,9 @@ feature
 			projectile_damage := 0
 			projectile_cost := 0
 			create choice_selected.make_empty
-			choice_selected.force ([1,"Starfighter"], choice_selected.count+1)
+			choice_selected.force ([1,"Standard"], choice_selected.count+1)
 			choice_selected.force ([1,"None"], choice_selected.count+1)
-			choice_selected.force ([1,"Starfighter"], choice_selected.count+1)
+			choice_selected.force ([1,"Standard"], choice_selected.count+1)
 			choice_selected.force ([1,"1:Recall (50 energy): Teleport back to spawn."], choice_selected.count+1)
 		end
 
@@ -66,7 +66,7 @@ feature
 		end
 	set_e_regen(er : INTEGER)
 		do
-			health := er
+		 e_regen:= er
 		end
 	set_vision(v : INTEGER)
 		do

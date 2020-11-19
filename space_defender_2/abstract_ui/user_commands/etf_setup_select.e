@@ -16,8 +16,20 @@ feature -- command
 			setup_select_precond(value)
     	do
 			-- perform some update on the model state
-			model.setup_array[model.cursor].select_choice (value)
-			model.set_output_msg (model.setup_array[model.cursor].output)
+			if model.setup_array[model.cursor].in_range (value) then
+				if model.is_error = true then
+					model.toggle_is_error
+				end
+				model.setup_array[model.cursor].select_choice (value)
+				model.set_success_output_msg (model.setup_array[model.cursor].output)
+
+			else
+			if model.is_error = false then
+					model.toggle_is_error
+				end
+			
+				model.set_error_output_msg (model.error.option_out_of_range)
+			end
 			etf_cmd_container.on_change.notify ([Current])
     	end
 
