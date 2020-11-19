@@ -32,12 +32,7 @@ feature -- command
 
 			model.set_error_output_msg (model.error.setup_back_outside_setup)
 		end
-		if model.in_game and not (model.is_error)  then
-			model.set_success_output_msg ("In Game"+model.in_setup.out)
-		end
-
-
-			etf_cmd_container.on_change.notify ([Current])
+		etf_cmd_container.on_change.notify ([Current])
     	end
 
 end

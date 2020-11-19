@@ -32,6 +32,7 @@ feature {NONE} -- Initialization
 			cursor := 0
 			debug_mode:=false
 			is_error:=false
+			in_toggle_mode:=false
 			create state_name.make_empty
 			create state_type.make_empty
 			create state_indicate.make_empty
@@ -78,6 +79,7 @@ feature -- model attributes
 	ship:STARFIGHTER
 	board : ARRAY2[STRING]
 	grid_layout:STRING
+	in_toggle_mode:BOOLEAN
 
 
 feature --utility operations
@@ -97,7 +99,10 @@ feature --utility operations
 		do
 			is_error := not is_error
 		end
-
+	toggle_toggle_mode
+		do
+			in_toggle_mode := not in_toggle_mode
+		end
 
 
 
@@ -113,7 +118,12 @@ feature --utility operations
 
 	set_state_type
 		do
-			state_type := "normal"
+			if in_toggle_mode then
+			 	state_type := "debug"
+			else
+				state_type := "normal"
+			end
+
 		end
 	set_state
 		do
@@ -127,7 +137,7 @@ feature --utility operations
 	set_success_output_msg(s:STRING)
 		do
 			output_msg.make_empty
-			set_state_type
+				set_state_type
 				set_indicate
 				set_state
 			output_msg.append ("%N"+s)
@@ -226,6 +236,18 @@ feature -- model operations
 			s.append ("    Projectile Pattern:"+ship.choice_selected[1].name+", Projectile Damage:"+ship.projectile_damage.out+", Projectile Cost:"+ship.projectile_cost.out+" (energy)%N")
 			s.append ("    Power:Recall (50 energy): "+ship.choice_selected[4].name+"%N")
 			s.append ("    score: 0")
+			if in_toggle_mode then
+			s.append ("  Enemy:%N")
+			s.append ("  Projectile:%N")
+			s.append ("  Friendly Projectile Action:%N")
+			s.append ("  Enemy Projectile Action:%N")
+			s.append ("  Starfighter Action:%N")
+			s.append ("    The Starfighter(id:0) passes at location [E,1], doubling regen rate.%N")
+			s.append ("  Enemy Action:%N")
+			s.append ("  Natural Enemy Spawn:")
+			end
+
+
 			make_board
 			s.append (grid_layout)
 			set_success_output_msg (s)
@@ -235,9 +257,11 @@ feature -- model operations
 	make_board
 		local
 			fi: FORMAT_INTEGER
+			vision:INTEGER
 		do
 			create fi.make (2)
 			grid_layout := ""
+
 			across 1 |..| board.height as r
 			loop
 				across 1 |..| board.width as c
@@ -245,7 +269,14 @@ feature -- model operations
 					if(ship_location.row ~ r.item and ship_location.column ~ c.item) then
 							board.put ("S",r.item,c.item)
 					else
+						vision := ((ship_location.row-r.item).abs+(ship_location.column-c.item).abs)
+						vision := vision.abs
+						if (vision > ship.vision) and (not in_toggle_mode) then
+							board.put ("?", r.item,c.item)
+						else
 							board.put ("_",r.item,c.item)
+						end
+
 					end
 				end
 			end
@@ -310,7 +341,7 @@ feature -- queries
 	out : STRING
 		do
 			create Result.make_empty
-			if cursor = 0 then
+			if cursor = 0 and not (is_error or in_toggle_mode) then
 				set_state_type
 				set_indicate
 				set_state

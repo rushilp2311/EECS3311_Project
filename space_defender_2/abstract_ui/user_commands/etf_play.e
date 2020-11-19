@@ -17,8 +17,7 @@ feature -- command
     	do
 			-- perform some update on the model state
 			if model.in_setup then
-				model.output_msg.append (model.error.play_in_game)
-				model.set_indicate
+				model.set_error_output_msg(model.error.play_in_setup)
 			else
 				model.set_parameters (row, column, g_threshold, f_threshold, c_threshold, i_threshold, p_threshold)
 				model.increment_cursor
