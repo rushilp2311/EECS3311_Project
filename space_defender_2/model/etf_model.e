@@ -41,6 +41,10 @@ feature {NONE} -- Initialization
 			create state_items.make(7)
 			create ship.make
 			create ship_array.make_empty
+			create ship_location.default_create
+			create grid_layout.make_empty
+			row_indexes := <<'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'>>
+			create board.make_filled (create {STRING}.make_empty,0,0)
 			----------------
 			set_state_items
 		end
@@ -58,7 +62,7 @@ feature -- model attributes
 	in_game:BOOLEAN
 	cursor:INTEGER
 	debug_mode:BOOLEAN
-
+	row_indexes : ARRAY[CHARACTER]
 	state_name:STRING
 	error:ERROR
 	is_error : BOOLEAN
@@ -70,7 +74,10 @@ feature -- model attributes
 	setup_array:ARRAY[SETUP]
 	state_items : HASH_TABLE[STRING,INTEGER]
 	ship_array:ARRAY[STARFIGHTER]
+	ship_location : TUPLE[row:INTEGER_32;column:INTEGER_32]
 	ship:STARFIGHTER
+	board : ARRAY2[STRING]
+	grid_layout:STRING
 
 
 feature --utility operations
@@ -145,6 +152,8 @@ feature --utility operations
 		end
 
 	set_parameters(r:INTEGER; c:INTEGER; n1:INTEGER; n2:INTEGER; n3:INTEGER; n4:INTEGER; n5:INTEGER)
+	local
+			s_row:REAL_64
 		do
 			row := r
 			column := c
@@ -153,6 +162,10 @@ feature --utility operations
 			c_threshold := n3
 			i_threshold := n4
 			p_threshold := n5
+			s_row := row/2
+			ship_location.row := s_row.ceiling
+			ship_location.column := 1
+			create board.make_filled ("",row,column)
 		end
 	set_setup_array
 	local
@@ -202,6 +215,71 @@ feature --utility operations
 
 feature -- model operations
 
+
+	display
+		local
+			s :STRING
+		do
+			create s.make_empty
+			s.append ("  Starfighter:%N")
+			s.append ("    [0,S]->health:"+ship.health.out+"/"+ship.health.out+", energy:"+ship.energy.out+"/"+ship.energy.out+", Regen:"+ship.h_regen.out+"/"+ship.e_regen.out+", Armour:"+ship.armour.out+", Vision:"+ship.vision.out+", Move:"+ship.move.out+", Move Cost:"+ship.move_cost.out+", location:["+row_indexes.item (ship_location.row).out+",1]%N")
+			s.append ("    Projectile Pattern:"+ship.choice_selected[1].name+", Projectile Damage:"+ship.projectile_damage.out+", Projectile Cost:"+ship.projectile_cost.out+" (energy)%N")
+			s.append ("    Power:Recall (50 energy): "+ship.choice_selected[4].name+"%N")
+			s.append ("    score: 0")
+			make_board
+			s.append (grid_layout)
+			set_success_output_msg (s)
+
+		end
+
+	make_board
+		local
+			fi: FORMAT_INTEGER
+		do
+			create fi.make (2)
+			grid_layout := ""
+			across 1 |..| board.height as r
+			loop
+				across 1 |..| board.width as c
+				loop
+					if(ship_location.row ~ r.item and ship_location.column ~ c.item) then
+							board.put ("S",r.item,c.item)
+					else
+							board.put ("_",r.item,c.item)
+					end
+				end
+			end
+			grid_layout.append("%N")
+			grid_layout.append ("    ")
+			across 1 |..| board.width as i
+			loop
+				if (i.item) < 10  then
+					grid_layout.append("  " +  (i.item).out)
+				else
+					grid_layout.append(" " +  (i.item).out)
+				end
+
+			end
+			across 1 |..| board.height as r
+			loop
+				grid_layout.append ("%N    "+ row_indexes[r.item].out)
+				grid_layout.append (" ")
+				across 1 |..| board.width as c
+				loop
+					grid_layout.append (board.item (r.item, c.item))
+					if c.item < board.width then
+						grid_layout.append ("  ")
+
+					end
+				end
+			end
+		end
+
+
+
+
+
+
 	play
 	local
 		s :STRING
@@ -217,8 +295,8 @@ feature -- model operations
 				ship.vision := ship.vision + ship_array[sa.item].vision
 				ship.move := ship.move + ship_array[sa.item].move
 				ship.move_cost := ship.move_cost + ship_array[sa.item].move_cost
-
 			end
+			display
 		end
 
 

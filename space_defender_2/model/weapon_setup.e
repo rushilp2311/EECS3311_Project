@@ -28,7 +28,7 @@ feature
 			inspect choice
 
 					when 2 then
-						ship.health := 10
+						ship.health := 0
 						ship.energy := 60
 						ship.h_regen := 0
 						ship.e_regen := 2
@@ -80,7 +80,7 @@ feature
 						model.ship.choice_selected[1].pos := 5
 						model.ship.choice_selected[1].name := "Splitter"
 					else
-						ship.health := 0
+						ship.health := 10
 						ship.energy := 10
 						ship.h_regen := 0
 						ship.e_regen := 1
