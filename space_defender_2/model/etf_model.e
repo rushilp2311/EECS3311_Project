@@ -42,10 +42,16 @@ feature {NONE} -- Initialization
 			create state_items.make(7)
 			create ship.make
 			create ship_array.make_empty
-			create ship_location.default_create
+
 			create grid_layout.make_empty
 			row_indexes := <<'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'>>
 			create board.make_filled (create {STRING}.make_empty,0,0)
+			rand1 := 0
+			rand2 := 0
+			enemy_id := 1
+			create enemy_table.make (10)
+
+
 			----------------
 			set_state_items
 		end
@@ -75,17 +81,39 @@ feature -- model attributes
 	setup_array:ARRAY[SETUP]
 	state_items : HASH_TABLE[STRING,INTEGER]
 	ship_array:ARRAY[STARFIGHTER]
-	ship_location : TUPLE[row:INTEGER_32;column:INTEGER_32]
+
 	ship:STARFIGHTER
 	board : ARRAY2[STRING]
 	grid_layout:STRING
 	in_toggle_mode:BOOLEAN
 
+	--Enemy attributes
+	enemy_id : INTEGER
+	enemy_table : HASH_TABLE[ENEMY,INTEGER]
+
+
+	-- Random generator access feature object
+	rand_access : RANDOM_GENERATOR_ACCESS
+
+	-- Random numbers
+	rand1 : INTEGER
+	rand2 : INTEGER
+
+
+
 
 feature --utility operations
 
+	-- Generating random number
+	generate_random_number
+		do
+			rand1 := rand_access.rchoose (1, row)
+			rand2 := rand_access.rchoose (1, 100)
+		end
 
-	--setters
+
+
+	-- Toggle features to toggle boolean values accordingly
 
 	toggle_in_setup
 		do
@@ -105,7 +133,7 @@ feature --utility operations
 		end
 
 
-
+	-- Setting Indicator for error / ok
 	set_indicate
 		do
 			if is_error then
@@ -116,6 +144,7 @@ feature --utility operations
 
 		end
 
+	-- State type (DEBUG / NORMAL)
 	set_state_type
 		do
 			if in_toggle_mode then
@@ -125,15 +154,24 @@ feature --utility operations
 			end
 
 		end
+
+	-- Setting state
 	set_state
 		do
 			if attached state_items.item (cursor) as s  then
 				state_name := s
 			end
 
-			output_msg := "  state:"+state_name +", "+state_type+", "+state_indicate
+
+				if state_name ~ "in game" then
+					output_msg := "  state:"+state_name +"(0.0), "+state_type+", "+state_indicate
+				else
+					output_msg := "  state:"+state_name +", "+state_type+", "+state_indicate
+				end
+
 		end
 
+	-- Setting the output string when successfully executed
 	set_success_output_msg(s:STRING)
 		do
 			output_msg.make_empty
@@ -142,6 +180,8 @@ feature --utility operations
 				set_state
 			output_msg.append ("%N"+s)
 		end
+
+	-- Setting the output string when error is occured
 	set_error_output_msg(s:STRING)
 		do
 			set_state_type
@@ -150,6 +190,7 @@ feature --utility operations
 			output_msg.append ("%N  "+s)
 		end
 
+	--To keep track of state
 	set_state_items
 		do
 			state_items.extend ("not started",0)
@@ -161,6 +202,7 @@ feature --utility operations
 			state_items.extend ("in game",6)
 		end
 
+	-- Storing parameters when first paly command is used
 	set_parameters(r:INTEGER; c:INTEGER; n1:INTEGER; n2:INTEGER; n3:INTEGER; n4:INTEGER; n5:INTEGER)
 	local
 			s_row:REAL_64
@@ -173,10 +215,12 @@ feature --utility operations
 			i_threshold := n4
 			p_threshold := n5
 			s_row := row/2
-			ship_location.row := s_row.ceiling
-			ship_location.column := 1
+			ship.location.row := s_row.ceiling
+			ship.location.column := 1
 			create board.make_filled ("",row,column)
 		end
+
+	--Array for the different setup stages in order
 	set_setup_array
 	local
 		i : INTEGER
@@ -196,6 +240,8 @@ feature --utility operations
 			end
 		end
 
+
+	-- Features to update cursor
 	set_cursor_next(c :INTEGER)
 		do
 			cursor := cursor + c
@@ -218,7 +264,50 @@ feature --utility operations
 		do
 			cursor := cursor - 1
 		end
+	-----------------------------------------------------------------------------------
+	--ENEMY METHODS
 
+	add_enemy
+		do
+			generate_random_number
+			if rand2 >= 1 and rand2 < g_threshold then
+				enemy_table.extend (create {GRUNT}.make, enemy_id)
+				if attached enemy_table.item (enemy_id) as el then
+					el.location := [rand1,column]
+				end
+				enemy_id := enemy_id + 1
+			elseif rand2 >= g_threshold and rand2 < f_threshold then
+				enemy_table.extend (create {FIGHTER}.make, enemy_id)
+				if attached enemy_table.item (enemy_id) as el then
+					el.location := [rand1,column]
+				end
+				enemy_id := enemy_id + 1
+			elseif rand2 >= f_threshold and rand2 < c_threshold then
+				enemy_table.extend (create {CARRIER}.make, enemy_id)
+				if attached enemy_table.item (enemy_id) as el then
+					el.location := [rand1,column]
+				end
+				enemy_id := enemy_id + 1
+			elseif rand2 >= c_threshold and rand2 < i_threshold then
+				enemy_table.extend (create {INTERCEPTOR}.make, enemy_id)
+				if attached enemy_table.item (enemy_id) as el then
+					el.location := [rand1,column]
+				end
+				enemy_id := enemy_id + 1
+			elseif rand2 >= i_threshold and rand2 < p_threshold then
+				enemy_table.extend (create {PYLON}.make, enemy_id)
+				if attached enemy_table.item (enemy_id) as el then
+					el.location := [rand1,column]
+				end
+				enemy_id := enemy_id + 1
+
+			else
+
+			end
+
+
+
+		end
 
 
 
@@ -232,19 +321,20 @@ feature -- model operations
 		do
 			create s.make_empty
 			s.append ("  Starfighter:%N")
-			s.append ("    [0,S]->health:"+ship.health.out+"/"+ship.health.out+", energy:"+ship.energy.out+"/"+ship.energy.out+", Regen:"+ship.h_regen.out+"/"+ship.e_regen.out+", Armour:"+ship.armour.out+", Vision:"+ship.vision.out+", Move:"+ship.move.out+", Move Cost:"+ship.move_cost.out+", location:["+row_indexes.item (ship_location.row).out+",1]%N")
+			s.append ("    [0,S]->health:"+ship.health.out+"/"+ship.health.out+", energy:"+ship.energy.out+"/"+ship.energy.out+", Regen:"+ship.h_regen.out+"/"+ship.e_regen.out+", Armour:"+ship.armour.out+", Vision:"+ship.vision.out+", Move:"+ship.move.out+", Move Cost:"+ship.move_cost.out+", location:["+row_indexes.item (ship.location.row).out+",1]%N")
 			s.append ("    Projectile Pattern:"+ship.choice_selected[1].name+", Projectile Damage:"+ship.projectile_damage.out+", Projectile Cost:"+ship.projectile_cost.out+" (energy)%N")
 			s.append ("    Power:Recall (50 energy): "+ship.choice_selected[4].name+"%N")
 			s.append ("    score: 0")
+
 			if in_toggle_mode then
-			s.append ("  Enemy:%N")
-			s.append ("  Projectile:%N")
-			s.append ("  Friendly Projectile Action:%N")
-			s.append ("  Enemy Projectile Action:%N")
-			s.append ("  Starfighter Action:%N")
-			s.append ("    The Starfighter(id:0) passes at location [E,1], doubling regen rate.%N")
-			s.append ("  Enemy Action:%N")
-			s.append ("  Natural Enemy Spawn:")
+				s.append ("  Enemy:%N")
+				s.append ("  Projectile:%N")
+				s.append ("  Friendly Projectile Action:%N")
+				s.append ("  Enemy Projectile Action:%N")
+				s.append ("  Starfighter Action:%N")
+				s.append ("    The Starfighter(id:0) passes at location [E,1], doubling regen rate.%N")
+				s.append ("  Enemy Action:%N")
+				s.append ("  Natural Enemy Spawn:")
 			end
 
 
@@ -266,10 +356,10 @@ feature -- model operations
 			loop
 				across 1 |..| board.width as c
 				loop
-					if(ship_location.row ~ r.item and ship_location.column ~ c.item) then
+					if(ship.location.row ~ r.item and ship.location.column ~ c.item) then
 							board.put ("S",r.item,c.item)
 					else
-						vision := ((ship_location.row-r.item).abs+(ship_location.column-c.item).abs)
+						vision := ((ship.location.row-r.item).abs+(ship.location.column-c.item).abs)
 						vision := vision.abs
 						if (vision > ship.vision) and (not in_toggle_mode) then
 							board.put ("?", r.item,c.item)
@@ -280,6 +370,19 @@ feature -- model operations
 					end
 				end
 			end
+
+
+			across 1 |..| (enemy_table.count) as et
+			loop
+				if attached enemy_table.item (et.item) as el then
+					if  in_toggle_mode or (vision < ship.vision)  then
+						board.put (el.symbol,el.location.row,el.location.column)
+					end
+				end
+			end
+
+
+
 			grid_layout.append("%N")
 			grid_layout.append ("    ")
 			across 1 |..| board.width as i
@@ -306,11 +409,6 @@ feature -- model operations
 			end
 		end
 
-
-
-
-
-
 	play
 	local
 		s :STRING
@@ -326,9 +424,32 @@ feature -- model operations
 				ship.vision := ship.vision + ship_array[sa.item].vision
 				ship.move := ship.move + ship_array[sa.item].move
 				ship.move_cost := ship.move_cost + ship_array[sa.item].move_cost
+				ship.projectile_cost := ship_array[1].projectile_cost
+				ship.projectile_damage := ship_array[1].projectile_damage
 			end
 			display
 		end
+	pass
+		do
+
+			add_enemy
+			display
+		end
+
+	move
+		do
+
+			add_enemy
+			display
+
+		end
+	fire
+		do
+
+			add_enemy
+			display
+		end
+
 
 
 	reset

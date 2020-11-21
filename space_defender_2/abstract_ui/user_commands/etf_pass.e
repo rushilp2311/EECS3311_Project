@@ -29,6 +29,7 @@ feature -- command
 				if model.is_error = true then
 					model.toggle_is_error
 				end
+				model.pass
 
 			end
 
