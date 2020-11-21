@@ -34,6 +34,7 @@ feature -- command
 				if model.is_error = false then
 					model.toggle_is_error
 				end
+				model.increment_error_state_counter
 				model.set_error_output_msg (model.error.setup_next_outside_setup)
 			end
 

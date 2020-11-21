@@ -29,7 +29,7 @@ feature -- command
 			if model.is_error = false then
 				model.toggle_is_error
 			end
-
+			model.increment_error_state_counter
 			model.set_error_output_msg (model.error.setup_back_outside_setup)
 		end
 		etf_cmd_container.on_change.notify ([Current])

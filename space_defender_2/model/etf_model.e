@@ -33,6 +33,8 @@ feature {NONE} -- Initialization
 			debug_mode:=false
 			is_error:=false
 			in_toggle_mode:=false
+			success_state_counter := 0
+			error_state_counter := 0
 			create state_name.make_empty
 			create state_type.make_empty
 			create state_indicate.make_empty
@@ -81,7 +83,8 @@ feature -- model attributes
 	setup_array:ARRAY[SETUP]
 	state_items : HASH_TABLE[STRING,INTEGER]
 	ship_array:ARRAY[STARFIGHTER]
-
+	success_state_counter :INTEGER
+	error_state_counter :INTEGER
 	ship:STARFIGHTER
 	board : ARRAY2[STRING]
 	grid_layout:STRING
@@ -163,8 +166,8 @@ feature --utility operations
 			end
 
 
-				if state_name ~ "in game" then
-					output_msg := "  state:"+state_name +"(0.0), "+state_type+", "+state_indicate
+				if cursor > 5 then
+					output_msg := "  state:"+state_name +"("+success_state_counter.out+"."+error_state_counter.out+"), "+state_type+", "+state_indicate
 				else
 					output_msg := "  state:"+state_name +", "+state_type+", "+state_indicate
 				end
@@ -264,9 +267,17 @@ feature --utility operations
 		do
 			cursor := cursor - 1
 		end
+	increment_success_state_counter
+		do
+			success_state_counter := success_state_counter + 1
+		end
+	increment_error_state_counter
+		do
+			error_state_counter := error_state_counter + 1
+		end
 	-----------------------------------------------------------------------------------
 	--ENEMY METHODS
-
+	--Adding enemy to enemy table
 	add_enemy
 		do
 			generate_random_number
@@ -304,9 +315,6 @@ feature --utility operations
 			else
 
 			end
-
-
-
 		end
 
 
@@ -314,7 +322,7 @@ feature --utility operations
 
 feature -- model operations
 
-
+	--Displaying info and board
 	display
 		local
 			s :STRING
@@ -352,6 +360,7 @@ feature -- model operations
 			create fi.make (2)
 			grid_layout := ""
 
+			--Adding to board array
 			across 1 |..| board.height as r
 			loop
 				across 1 |..| board.width as c
@@ -371,7 +380,7 @@ feature -- model operations
 				end
 			end
 
-
+			--Adding enemy to the board
 			across 1 |..| (enemy_table.count) as et
 			loop
 				if attached enemy_table.item (et.item) as el then
@@ -382,7 +391,7 @@ feature -- model operations
 			end
 
 
-
+			-- Appending board array to a string
 			grid_layout.append("%N")
 			grid_layout.append ("    ")
 			across 1 |..| board.width as i
@@ -431,21 +440,71 @@ feature -- model operations
 		end
 	pass
 		do
-
+			error_state_counter := 0 --Reseting error state cursor
+			increment_success_state_counter
 			add_enemy
 			display
 		end
 
-	move
+	move(move_row:INTEGER;move_column:INTEGER)
+		local
+			j,k:INTEGER
 		do
+			error_state_counter := 0 --Reseting error state cursor
+			increment_success_state_counter
+			if ship.location.row < row  then
+				from
+					j:= ship.location.row
+				until
+					j > move_row
+				loop
 
+					ship.location := [j,ship.location.column]
+					j:=j+1
+				end
+
+			end
+
+				-- move up in same column
+				if ship.location.row > move_row  then
+					from
+						j := ship.location.row
+					until
+						j < move_row
+					loop
+						ship.location := [j  , ship.location.column]
+						j := j - 1
+					end
+				end
+
+				-- move right in same row
+				if ship.location.column < move_column then
+					across
+						(ship.location.column + 1) |..| (move_column)   is index
+					loop
+						ship.location := [ship.location.row, index]
+					end
+				end
+
+
+				-- move left in same row
+				if ship.location.column >  column then
+					from
+						k := ship.location.column - 1
+					until
+						k < move_column
+					loop
+							ship.location := [ship.location.row, k]
+						k := k - 1
+					end
+				end
 			add_enemy
 			display
 
 		end
 	fire
 		do
-
+			error_state_counter := 0 --Reseting error state cursor
 			add_enemy
 			display
 		end

@@ -43,13 +43,18 @@ feature --attributes
 	projectile_damage:INTEGER assign set_projectile_damage
 	projectile_cost:INTEGER assign set_projectile_cost
 	choice_selected : ARRAY[TUPLE[pos:INTEGER;name:STRING]]
-	location : TUPLE[row:INTEGER_32;column:INTEGER_32]
+	location : TUPLE[row:INTEGER_32;column:INTEGER_32] assign set_location
 
 feature
 	add_choice_selected(t:TUPLE[pos:INTEGER;name:STRING])
 		do
 			choice_selected.force (t,choice_selected.count + 1)
 		end
+	set_location(t:	TUPLE[row:INTEGER_32;column:INTEGER_32])
+		do
+			location := t
+		end
+
 	set_health(h : INTEGER)
 		do
 			health := h
