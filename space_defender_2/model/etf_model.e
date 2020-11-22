@@ -44,7 +44,7 @@ feature {NONE} -- Initialization
 			create state_items.make(7)
 			create ship.make
 			create ship_array.make_empty
-
+			create friendly_projectile_list.make_equal (0)
 			create grid_layout.make_empty
 			row_indexes := <<'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'>>
 			create board.make_filled (create {STRING}.make_empty,0,0)
@@ -52,10 +52,11 @@ feature {NONE} -- Initialization
 			rand2 := 0
 			enemy_id := 1
 			create enemy_table.make (10)
-
-
+			projectile_id:=-1
+			create fire_cmd.make
 			----------------
 			set_state_items
+
 		end
 
 feature -- model attributes
@@ -89,6 +90,8 @@ feature -- model attributes
 	board : ARRAY2[STRING]
 	grid_layout:STRING
 	in_toggle_mode:BOOLEAN
+	fire_cmd : FIRE
+
 
 	--Enemy attributes
 	enemy_id : INTEGER
@@ -102,6 +105,11 @@ feature -- model attributes
 	rand1 : INTEGER
 	rand2 : INTEGER
 
+
+	--Friendly Projectile Table
+	friendly_projectile_list : HASH_TABLE[TUPLE[row:INTEGER;column:INTEGER],INTEGER]
+
+	projectile_id:INTEGER
 
 
 
@@ -221,6 +229,7 @@ feature --utility operations
 			ship.location.row := s_row.ceiling
 			ship.location.column := 1
 			create board.make_filled ("",row,column)
+			initialize_board
 		end
 
 	--Array for the different setup stages in order
@@ -275,6 +284,10 @@ feature --utility operations
 		do
 			error_state_counter := error_state_counter + 1
 		end
+	decrement_projectile_id
+		do
+			projectile_id := projectile_id - 1
+		end
 	-----------------------------------------------------------------------------------
 	--ENEMY METHODS
 	--Adding enemy to enemy table
@@ -285,30 +298,35 @@ feature --utility operations
 				enemy_table.extend (create {GRUNT}.make, enemy_id)
 				if attached enemy_table.item (enemy_id) as el then
 					el.location := [rand1,column]
+					board.put ("G",rand1, column)
 				end
 				enemy_id := enemy_id + 1
 			elseif rand2 >= g_threshold and rand2 < f_threshold then
 				enemy_table.extend (create {FIGHTER}.make, enemy_id)
 				if attached enemy_table.item (enemy_id) as el then
 					el.location := [rand1,column]
+					board.put ("F",rand1, column)
 				end
 				enemy_id := enemy_id + 1
 			elseif rand2 >= f_threshold and rand2 < c_threshold then
 				enemy_table.extend (create {CARRIER}.make, enemy_id)
 				if attached enemy_table.item (enemy_id) as el then
 					el.location := [rand1,column]
+					board.put ("C",rand1, column)
 				end
 				enemy_id := enemy_id + 1
 			elseif rand2 >= c_threshold and rand2 < i_threshold then
 				enemy_table.extend (create {INTERCEPTOR}.make, enemy_id)
 				if attached enemy_table.item (enemy_id) as el then
 					el.location := [rand1,column]
+					board.put ("I",rand1, column)
 				end
 				enemy_id := enemy_id + 1
 			elseif rand2 >= i_threshold and rand2 < p_threshold then
 				enemy_table.extend (create {PYLON}.make, enemy_id)
 				if attached enemy_table.item (enemy_id) as el then
 					el.location := [rand1,column]
+					board.put ("P",rand1, column)
 				end
 				enemy_id := enemy_id + 1
 
@@ -316,7 +334,6 @@ feature --utility operations
 
 			end
 		end
-
 
 
 
@@ -331,9 +348,9 @@ feature -- model operations
 			s.append ("  Starfighter:%N")
 			s.append ("    [0,S]->health:"+ship.health.out+"/"+ship.health.out+", energy:"+ship.energy.out+"/"+ship.energy.out+", Regen:"+ship.h_regen.out+"/"+ship.e_regen.out+", Armour:"+ship.armour.out+", Vision:"+ship.vision.out+", Move:"+ship.move.out+", Move Cost:"+ship.move_cost.out+", location:["+row_indexes.item (ship.location.row).out+",1]%N")
 			s.append ("    Projectile Pattern:"+ship.choice_selected[1].name+", Projectile Damage:"+ship.projectile_damage.out+", Projectile Cost:"+ship.projectile_cost.out+" (energy)%N")
-			s.append ("    Power:Recall (50 energy): "+ship.choice_selected[4].name+"%N")
+			s.append ("    Power:"+ship.choice_selected[4].name+"%N")
 			s.append ("    score: 0")
-
+			
 			if in_toggle_mode then
 				s.append ("  Enemy:%N")
 				s.append ("  Projectile:%N")
@@ -352,15 +369,8 @@ feature -- model operations
 
 		end
 
-	make_board
-		local
-			fi: FORMAT_INTEGER
-			vision:INTEGER
+	initialize_board
 		do
-			create fi.make (2)
-			grid_layout := ""
-
-			--Adding to board array
 			across 1 |..| board.height as r
 			loop
 				across 1 |..| board.width as c
@@ -368,18 +378,21 @@ feature -- model operations
 					if(ship.location.row ~ r.item and ship.location.column ~ c.item) then
 							board.put ("S",r.item,c.item)
 					else
-						vision := ((ship.location.row-r.item).abs+(ship.location.column-c.item).abs)
-						vision := vision.abs
-						if (vision > ship.vision) and (not in_toggle_mode) then
-							board.put ("?", r.item,c.item)
-						else
 							board.put ("_",r.item,c.item)
-						end
-
 					end
 				end
 			end
 
+		end
+
+
+	make_board
+		local
+			fi: FORMAT_INTEGER
+			vision:INTEGER
+		do
+			create fi.make (2)
+			grid_layout := ""
 			--Adding enemy to the board
 			across 1 |..| (enemy_table.count) as et
 			loop
@@ -389,8 +402,6 @@ feature -- model operations
 					end
 				end
 			end
-
-
 			-- Appending board array to a string
 			grid_layout.append("%N")
 			grid_layout.append ("    ")
@@ -409,7 +420,14 @@ feature -- model operations
 				grid_layout.append (" ")
 				across 1 |..| board.width as c
 				loop
-					grid_layout.append (board.item (r.item, c.item))
+					vision := ((ship.location.row-r.item).abs+(ship.location.column-c.item).abs)
+						vision := vision.abs
+						if (vision > ship.vision) and (not in_toggle_mode) then
+							grid_layout.append ("?")
+						else
+							grid_layout.append (board.item (r.item, c.item))
+						end
+
 					if c.item < board.width then
 						grid_layout.append ("  ")
 
@@ -452,6 +470,7 @@ feature -- model operations
 		do
 			error_state_counter := 0 --Reseting error state cursor
 			increment_success_state_counter
+			ship.old_location := ship.location
 			if ship.location.row < row  then
 				from
 					j:= ship.location.row
@@ -498,6 +517,8 @@ feature -- model operations
 						k := k - 1
 					end
 				end
+			board.put ("_", ship.old_location.row, ship.old_location.column)
+			board.put ("S", ship.location.row, ship.location.column)
 			add_enemy
 			display
 
@@ -505,6 +526,7 @@ feature -- model operations
 	fire
 		do
 			error_state_counter := 0 --Reseting error state cursor
+			fire_cmd.fire
 			add_enemy
 			display
 		end

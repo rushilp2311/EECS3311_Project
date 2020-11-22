@@ -123,14 +123,6 @@ feature
 			Result.append ("    Health:0, Energy:100, Regen:0/10, Armour:0, Vision:0, Move:0, Move Cost:5,%N")
 			Result.append ("    Projectile Damage:150, Projectile Cost:70 (energy)%N")
 			Result.append ("  Weapon Selected:"+model.ship.choice_selected[1].name)
-
-
-
-
-
-
-
-
 		end
 
 end

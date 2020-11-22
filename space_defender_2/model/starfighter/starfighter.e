@@ -23,6 +23,7 @@ feature
 			projectile_cost := 0
 
 			create location.default_create
+			create old_location.default_create
 			create choice_selected.make_empty
 			choice_selected.force ([1,"Standard"], choice_selected.count+1)
 			choice_selected.force ([1,"None"], choice_selected.count+1)
@@ -44,15 +45,18 @@ feature --attributes
 	projectile_cost:INTEGER assign set_projectile_cost
 	choice_selected : ARRAY[TUPLE[pos:INTEGER;name:STRING]]
 	location : TUPLE[row:INTEGER_32;column:INTEGER_32] assign set_location
+	old_location : TUPLE[row:INTEGER_32;column:INTEGER_32] assign set_old_location
 
 feature
-	add_choice_selected(t:TUPLE[pos:INTEGER;name:STRING])
-		do
-			choice_selected.force (t,choice_selected.count + 1)
-		end
+
+
 	set_location(t:	TUPLE[row:INTEGER_32;column:INTEGER_32])
 		do
 			location := t
+		end
+	set_old_location(t:TUPLE[row:INTEGER_32;column:INTEGER_32])
+		do
+			old_location := t
 		end
 
 	set_health(h : INTEGER)
