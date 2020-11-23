@@ -27,8 +27,8 @@ feature
 			inspect choice
 
 			when 2 then
-				ship.health := 75
-				ship.energy := 0
+				ship.total_health := 75
+				ship.total_energy := 0
 				ship.h_regen := 2
 				ship.e_regen := 0
 				ship.armour := 3
@@ -38,8 +38,8 @@ feature
 				model.ship.choice_selected[2].pos := 2
 				model.ship.choice_selected[2].name := "Light"
 			when 3 then
-				ship.health := 100
-				ship.energy := 0
+				ship.total_health := 100
+				ship.total_energy := 0
 				ship.h_regen := 13
 				ship.e_regen := 0
 				ship.armour := 5
@@ -49,8 +49,8 @@ feature
 				model.ship.choice_selected[2].pos := 3
 				model.ship.choice_selected[2].name := "Medium"
 			when 4 then
-				ship.health := 200
-				ship.energy := 0
+				ship.total_health := 200
+				ship.total_energy := 0
 				ship.h_regen := 4
 				ship.e_regen := 0
 				ship.armour := 10
@@ -60,8 +60,8 @@ feature
 				model.ship.choice_selected[2].pos := 4
 				model.ship.choice_selected[2].name := "Heavy"
 			else
-				ship.health := 50
-				ship.energy := 0
+				ship.total_health := 50
+				ship.total_energy := 0
 				ship.h_regen := 1
 				ship.e_regen := 0
 				ship.armour := 0

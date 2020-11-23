@@ -11,8 +11,10 @@ create
 feature
 	make
 		do
-			health := 0
-			energy := 0
+			current_health := 0
+			total_health := 0
+			current_energy := 0
+			total_energy := 0
 			h_regen := 0
 			e_regen := 0
 			armour := 0
@@ -33,8 +35,10 @@ feature
 
 feature --attributes
 
-	health:INTEGER assign set_health
-	energy:INTEGER assign set_energy
+	current_health:INTEGER assign set_current_health
+	total_health:INTEGER assign set_total_health
+	current_energy:INTEGER assign set_current_energy
+	total_energy:INTEGER assign set_total_energy
 	h_regen:INTEGER assign set_h_regen
 	e_regen:INTEGER assign set_e_regen
 	armour:INTEGER assign set_armour
@@ -59,13 +63,21 @@ feature
 			old_location := t
 		end
 
-	set_health(h : INTEGER)
+	set_current_health(ch : INTEGER)
 		do
-			health := h
+			current_health := ch
 		end
-	set_energy(e : INTEGER)
+	set_total_health(th : INTEGER)
 		do
-			energy := e
+			total_health := th
+		end
+	set_current_energy(ce : INTEGER)
+		do
+			current_energy := ce
+		end
+	set_total_energy(te : INTEGER)
+		do
+			total_energy := te
 		end
 	set_armour(a : INTEGER)
 		do

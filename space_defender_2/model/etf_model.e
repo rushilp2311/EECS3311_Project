@@ -54,6 +54,7 @@ feature {NONE} -- Initialization
 			create enemy_table.make (10)
 			projectile_id:=-1
 			create fire_cmd.make
+			create update.make
 			----------------
 			set_state_items
 
@@ -91,6 +92,7 @@ feature -- model attributes
 	grid_layout:STRING
 	in_toggle_mode:BOOLEAN
 	fire_cmd : FIRE
+	update : UPDATE_PROJECTILE
 
 
 	--Enemy attributes
@@ -107,7 +109,7 @@ feature -- model attributes
 
 
 	--Friendly Projectile Table
-	friendly_projectile_list : HASH_TABLE[TUPLE[row:INTEGER;column:INTEGER],INTEGER]
+	friendly_projectile_list : HASH_TABLE[FRIENDLY_PROJECTILE,INTEGER]
 
 	projectile_id:INTEGER
 
@@ -336,6 +338,29 @@ feature --utility operations
 		end
 
 
+calculate_move_cost(steps : INTEGER)
+	do
+		if (ship.move_cost * steps) <= ship.current_energy  then
+			ship.current_energy := ship.current_energy - (ship.move_cost * steps)
+		else
+			if is_error = false then
+				toggle_is_error
+				increment_error_state_counter
+				set_error_output_msg (error.move_resource)
+			end
+		end
+
+	end
+apply_regenration
+	do
+		if ship.current_health /= ship.total_health then
+			ship.current_health := ship.current_health + ship.h_regen
+		end
+		if ship.current_energy /= ship.total_energy then
+			ship.current_energy := ship.current_energy + ship.e_regen
+		end
+	end
+
 
 feature -- model operations
 
@@ -343,14 +368,30 @@ feature -- model operations
 	display
 		local
 			s :STRING
+			i : INTEGER
 		do
 			create s.make_empty
 			s.append ("  Starfighter:%N")
-			s.append ("    [0,S]->health:"+ship.health.out+"/"+ship.health.out+", energy:"+ship.energy.out+"/"+ship.energy.out+", Regen:"+ship.h_regen.out+"/"+ship.e_regen.out+", Armour:"+ship.armour.out+", Vision:"+ship.vision.out+", Move:"+ship.move.out+", Move Cost:"+ship.move_cost.out+", location:["+row_indexes.item (ship.location.row).out+",1]%N")
+			s.append ("    [0,S]->health:"+ship.current_health.out+"/"+ship.total_health.out+", energy:"+ship.current_energy.out+"/"+ship.total_energy.out+", Regen:"+ship.h_regen.out+"/"+ship.e_regen.out+", Armour:"+ship.armour.out+", Vision:"+ship.vision.out+", Move:"+ship.move.out+", Move Cost:"+ship.move_cost.out+", location:["+row_indexes.item (ship.location.row).out+","+ship.location.column.out+"]%N")
 			s.append ("    Projectile Pattern:"+ship.choice_selected[1].name+", Projectile Damage:"+ship.projectile_damage.out+", Projectile Cost:"+ship.projectile_cost.out+" (energy)%N")
 			s.append ("    Power:"+ship.choice_selected[4].name+"%N")
 			s.append ("    score: 0")
-			
+			s.append ("%N    "+((ship.location.row - ship.old_location.row).abs + (ship.location.column - ship.old_location.column).abs).out)
+
+--				from i := projectile_id
+--				until
+--					i > -1
+--				loop
+--					if attached friendly_projectile_list.item (i.item) as fp then
+--						s.append ("%N"+fp.id.out)
+--					end
+
+--					i := i + 1
+
+--			end
+
+
+
 			if in_toggle_mode then
 				s.append ("  Enemy:%N")
 				s.append ("  Projectile:%N")
@@ -443,8 +484,10 @@ feature -- model operations
 			create s.make_empty
 			across 1 |..| ship_array.count as sa
 			loop
-				ship.health := ship.health + ship_array[sa.item].health
-				ship.energy := ship.energy + ship_array[sa.item].energy
+				ship.total_health := ship.total_health + ship_array[sa.item].total_health
+				ship.current_health := ship.total_health
+				ship.total_energy := ship.total_energy + ship_array[sa.item].total_energy
+				ship.current_energy := ship.total_energy
 				ship.h_regen := ship.h_regen + ship_array[sa.item].h_regen
 				ship.e_regen := ship.e_regen + ship_array[sa.item].e_regen
 				ship.armour := ship.armour + ship_array[sa.item].armour
@@ -460,6 +503,11 @@ feature -- model operations
 		do
 			error_state_counter := 0 --Reseting error state cursor
 			increment_success_state_counter
+			if friendly_projectile_list.count > 0 then
+				update.update_friendly_projectile
+			end
+			apply_regenration
+			apply_regenration
 			add_enemy
 			display
 		end
@@ -468,10 +516,16 @@ feature -- model operations
 		local
 			j,k:INTEGER
 		do
+
+			--APPLY REGENRATION LEFT
+
 			error_state_counter := 0 --Reseting error state cursor
-			increment_success_state_counter
+
 			ship.old_location := ship.location
-			if ship.location.row < row  then
+			if friendly_projectile_list.count > 0 then
+				update.update_friendly_projectile
+			end
+			if ship.location.row < move_row  then
 				from
 					j:= ship.location.row
 				until
@@ -507,9 +561,9 @@ feature -- model operations
 
 
 				-- move left in same row
-				if ship.location.column >  column then
+				if ship.location.column >  move_column then
 					from
-						k := ship.location.column - 1
+						k := ship.location.column
 					until
 						k < move_column
 					loop
@@ -519,13 +573,22 @@ feature -- model operations
 				end
 			board.put ("_", ship.old_location.row, ship.old_location.column)
 			board.put ("S", ship.location.row, ship.location.column)
-			add_enemy
-			display
+			calculate_move_cost ((ship.location.row - ship.old_location.row).abs + (ship.location.column - ship.old_location.column).abs)
+			if is_error = false then
+				increment_success_state_counter
+				add_enemy
+				display
+			end
+
 
 		end
 	fire
 		do
+			--APPLY REGENRATION CHECK COLLIDING VALIDATIONS
 			error_state_counter := 0 --Reseting error state cursor
+			if friendly_projectile_list.count > 0 then
+				update.update_friendly_projectile
+			end
 			fire_cmd.fire
 			add_enemy
 			display

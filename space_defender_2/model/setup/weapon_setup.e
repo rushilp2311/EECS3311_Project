@@ -28,8 +28,8 @@ feature
 			inspect choice
 
 					when 2 then
-						ship.health := 0
-						ship.energy := 60
+						ship.total_health := 0
+						ship.total_energy := 60
 						ship.h_regen := 0
 						ship.e_regen := 2
 						ship.armour := 1
@@ -41,8 +41,8 @@ feature
 						model.ship.choice_selected[1].pos := 2
 						model.ship.choice_selected[1].name := "Spread"
 					when 3 then
-						ship.health := 0
-						ship.energy := 100
+						ship.total_health := 0
+						ship.total_energy := 100
 						ship.h_regen := 0
 						ship.e_regen := 5
 						ship.armour := 0
@@ -54,8 +54,8 @@ feature
 						model.ship.choice_selected[1].pos := 3
 						model.ship.choice_selected[1].name := "Snipe"
 					when 4 then
-						ship.health := 10
-						ship.energy := 0
+						ship.total_health := 10
+						ship.total_energy := 0
 						ship.h_regen := 10
 						ship.e_regen := 0
 						ship.armour := 2
@@ -67,8 +67,8 @@ feature
 						model.ship.choice_selected[1].pos := 4
 						model.ship.choice_selected[1].name := "Rocket"
 					when 5 then
-						ship.health := 0
-						ship.energy := 100
+						ship.total_health := 0
+						ship.total_energy := 100
 						ship.h_regen := 0
 						ship.e_regen := 10
 						ship.armour := 0
@@ -80,8 +80,8 @@ feature
 						model.ship.choice_selected[1].pos := 5
 						model.ship.choice_selected[1].name := "Splitter"
 					else
-						ship.health := 10
-						ship.energy := 10
+						ship.total_health := 10
+						ship.total_energy := 10
 						ship.h_regen := 0
 						ship.e_regen := 1
 						ship.armour := 0
