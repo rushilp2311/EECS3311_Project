@@ -40,6 +40,7 @@ feature
 	update_standard
 	local
 		j : INTEGER
+		old_location:TUPLE[row:INTEGER;column:INTEGER]
 		do
 
 			from i := -1
@@ -48,18 +49,21 @@ feature
 				loop
 					if attached model.m.friendly_projectile_list.item (i.item) as fp then
 						model.m.board.put ("_",fp.location.row , fp.location.column)
+						old_location := fp.location
 				    -- TODO move one step at a time
 					from j := 1
 					until
-						j >=5
+						j >=6
 					loop
 						fp.location.column := fp.location.column + 1
 						--Check for collision
 						j := j + 1
 					end
 				 if fp.location.column <= model.m.board.width  then
+				 	model.m.projectile_move_str.append ("    A friendly projectile(id:"+i.out+") moves: ["+model.m.row_indexes.item (fp.location.row).out+","+(fp.location.column-5).out+"] -> ["+model.m.row_indexes.item (fp.location.row).out+","+fp.location.column.out+"]%N")
 					model.m.board.put ("*",fp.location.row , fp.location.column)
 				 else
+				 	model.m.projectile_move_str.append ("    A friendly projectile(id:"+i.out+") moves: ["+model.m.row_indexes.item (fp.location.row).out+","+(fp.location.column-5).out+"] -> out of board%N")
 				 	model.m.friendly_projectile_list.remove (fp.id)
 				 end
 					end

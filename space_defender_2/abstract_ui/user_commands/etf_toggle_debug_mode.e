@@ -14,6 +14,7 @@ feature -- command
 	toggle_debug_mode
     	do
 			-- perform some update on the model state
+			model.increment_error_state_counter
 			model.toggle_toggle_mode
 			model.set_success_output_msg ("  In debug mode.")
 			etf_cmd_container.on_change.notify ([Current])

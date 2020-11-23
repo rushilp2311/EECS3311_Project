@@ -30,7 +30,7 @@ feature
 			choice_selected.force ([1,"Standard"], choice_selected.count+1)
 			choice_selected.force ([1,"None"], choice_selected.count+1)
 			choice_selected.force ([1,"Standard"], choice_selected.count+1)
-			choice_selected.force ([1,"1:Recall (50 energy): Teleport back to spawn."], choice_selected.count+1)
+			choice_selected.force ([1,"Recall (50 energy): Teleport back to spawn."], choice_selected.count+1)
 		end
 
 feature --attributes

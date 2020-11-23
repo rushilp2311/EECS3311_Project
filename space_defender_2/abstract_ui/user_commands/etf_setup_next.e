@@ -19,11 +19,14 @@ feature -- command
 			-- TODO validaton
 
 			if  model.in_setup then
+				model.error_state_counter := 0
 				model.set_cursor_next (state)
 				if model.is_error = true then
+
 					model.toggle_is_error
 				end
-				if model.cursor > 0 and model.cursor < 5 then
+				if model.cursor > 0 and model.cursor <= 5 then
+
 					model.setup_array[model.cursor].select_choice (1)
 					model.set_success_output_msg (model.setup_array[model.cursor].output)
 				else

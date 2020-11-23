@@ -54,8 +54,10 @@ feature
 					fp.id := model.m.projectile_id
 					fp.location := [model.m.ship.location.row, model.m.ship.location.column+1]
 					model.m.board.put ("*",fp.location.row, fp.location.column)
+					model.m.sf_act_display_str := model.m.sf_act_display.display_act (2)
+					model.m.decrement_projectile_id
 				end
-				model.m.decrement_projectile_id
+
 
 
 		end
@@ -67,24 +69,27 @@ feature
 					fp.id := model.m.projectile_id
 					fp.location := [model.m.ship.location.row, model.m.ship.location.column+1]
 					model.m.board.put ("*",fp.location.row, fp.location.column)
+					model.m.decrement_projectile_id
 				end
-				model.m.decrement_projectile_id
+
 
 				model.m.friendly_projectile_list.extend (create{FRIENDLY_PROJECTILE}.make, model.m.projectile_id)
 				if attached model.m.friendly_projectile_list.item (model.m.projectile_id) as fp then
 					fp.id := model.m.projectile_id
 					fp.location := [model.m.ship.location.row-1, model.m.ship.location.column+1]
 					model.m.board.put ("*",fp.location.row, fp.location.column)
+					model.m.decrement_projectile_id
 				end
-				model.m.decrement_projectile_id
+
 
 				model.m.friendly_projectile_list.extend (create{FRIENDLY_PROJECTILE}.make, model.m.projectile_id)
 				if attached model.m.friendly_projectile_list.item (model.m.projectile_id) as fp then
 					fp.id := model.m.projectile_id
 					fp.location := [model.m.ship.location.row+1, model.m.ship.location.column+1]
 					model.m.board.put ("*",fp.location.row, fp.location.column)
+					model.m.decrement_projectile_id
 				end
-				model.m.decrement_projectile_id
+
 
 		end
 	fire_snipe
@@ -101,26 +106,23 @@ feature
 				fp.id := model.m.projectile_id
 				fp.location := [model.m.ship.location.row-1, model.m.ship.location.column-1]
 				model.m.board.put ("*",fp.location.row, fp.location.column)
+				model.m.decrement_projectile_id
 			end
-			model.m.decrement_projectile_id
+
 
 			model.m.friendly_projectile_list.extend (create{FRIENDLY_PROJECTILE}.make, model.m.projectile_id)
 			if attached model.m.friendly_projectile_list.item (model.m.projectile_id) as fp then
 				fp.id := model.m.projectile_id
 				fp.location := [model.m.ship.location.row+1, model.m.ship.location.column-1]
 				model.m.board.put ("*",fp.location.row, fp.location.column)
+				model.m.decrement_projectile_id
 			end
-			model.m.decrement_projectile_id
+
 
 		end
 	fire_splitter
 		do
 			fire_standard
-
---			model.m.friendly_projectile_list.extend ([model.m.ship.location.row,model.m.ship.location.column+1], model.m.projectile_id)
---			model.m.board.put ("*", model.m.ship.location.row, model.m.ship.location.column+1)
---			model.m.decrement_projectile_id
-
 		end
 
 end
