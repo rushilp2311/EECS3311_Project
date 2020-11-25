@@ -496,9 +496,9 @@ feature -- model operations
 --			i:INTEGER
 		do
 			create s.make_empty
---			if friendly_projectile_list.count > 0 then
---				projectile_display
---			end
+			if friendly_projectile_list.count > 0 then
+				projectile_display
+			end
 
 			s.append ("  Starfighter:%N")
 			s.append ("    [0,S]->health:"+ship.current_health.out+"/"+ship.total_health.out+", energy:"+ship.current_energy.out+"/"+ship.total_energy.out+", Regen:"+ship.h_regen.out+"/"+ship.e_regen.out+", Armour:"+ship.armour.out+", Vision:"+ship.vision.out+", Move:"+ship.move.out+", Move Cost:"+ship.move_cost.out+", location:["+row_indexes.item (ship.location.row).out+","+ship.location.column.out+"]%N")
@@ -797,15 +797,20 @@ feature -- model operations
 			apply_regenration
 			inspect ship.choice_selected[4].pos
 			when 1 then
+				board.put ("_", ship.location.row, ship.location.column)
 				ship.location.row := ship.initial_location.row
 				ship.location.column := ship.initial_location.column
+				ship.location := [ship.initial_location.row,ship.initial_location.column]
+
+				board.put ("S", ship.location.row, ship.location.column)
 				if ship.current_energy > 50 then
 					ship.current_energy := ship.current_energy - 50
 				else
 					toggle_is_error
 					set_error_output_msg (error.special_resource)
 				end
-
+				create sf_act_display_str.make_empty
+				sf_act_display_str.append ("The Starfighter(id:0) uses special, teleporting to: ["+row_indexes.item (ship.initial_location.row).out+","+ship.location.column.out+"]")
 			else
 
 			end
