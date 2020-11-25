@@ -23,7 +23,7 @@ feature
 			move_cost := 0
 			projectile_damage := 0
 			projectile_cost := 0
-
+			create initial_location.default_create
 			create location.default_create
 			create old_location.default_create
 			create choice_selected.make_empty
@@ -49,11 +49,15 @@ feature --attributes
 	projectile_cost:INTEGER assign set_projectile_cost
 	choice_selected : ARRAY[TUPLE[pos:INTEGER;name:STRING]]
 	location : TUPLE[row:INTEGER_32;column:INTEGER_32] assign set_location
+	initial_location : TUPLE[row:INTEGER_32;column:INTEGER_32] assign set_initial_location
 	old_location : TUPLE[row:INTEGER_32;column:INTEGER_32] assign set_old_location
 
 feature
 
-
+	set_initial_location(il : TUPLE[row:INTEGER_32;column:INTEGER_32])
+		do
+			location := il
+		end
 	set_location(t:	TUPLE[row:INTEGER_32;column:INTEGER_32])
 		do
 			location := t

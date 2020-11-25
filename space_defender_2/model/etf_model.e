@@ -45,6 +45,7 @@ feature {NONE} -- Initialization
 			create ship.make
 			create ship_array.make_empty
 			create friendly_projectile_list.make (100)
+			create enemy_projectile_list.make (100)
 			create grid_layout.make_empty
 			row_indexes := <<'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'>>
 			create board.make_filled (create {STRING}.make_empty,0,0)
@@ -59,6 +60,7 @@ feature {NONE} -- Initialization
 			create sf_act_display_str.make_empty
 			create projectile_list_display_str.make_empty
 			create projectile_move_str.make_empty
+			create update_ep.make
 			----------------
 			set_state_items
 
@@ -101,10 +103,11 @@ feature -- model attributes
 	sf_act_display : STARFIGHTER_ACT_DISPLAY
 	projectile_list_display_str : STRING
 	projectile_move_str:STRING
+	update_ep : UPDATE_ENEMY_PROJECTILE
 
 
 	--Enemy attributes
-	enemy_id : INTEGER
+	enemy_id : INTEGER assign set_enemy_id
 	enemy_table : HASH_TABLE[ENEMY,INTEGER]
 
 
@@ -119,8 +122,8 @@ feature -- model attributes
 	--Friendly Projectile Table
 	friendly_projectile_list : HASH_TABLE[FRIENDLY_PROJECTILE,INTEGER]
 
-	projectile_id:INTEGER
-
+	projectile_id:INTEGER assign set_projectile_id
+	enemy_projectile_list : HASH_TABLE[ENEMY_PROJECTILE,INTEGER]
 
 
 feature --utility operations
@@ -153,6 +156,16 @@ feature --utility operations
 			in_toggle_mode := not in_toggle_mode
 		end
 
+	set_projectile_id(spi:INTEGER)
+		do
+			projectile_id := spi
+		end
+
+
+	set_enemy_id(eid:INTEGER)
+		do
+			enemy_id := eid
+		end
 
 	set_sf_act_display_str (s:STRING)
 		do
@@ -261,6 +274,8 @@ feature --utility operations
 			s_row := row/2
 			ship.location.row := s_row.ceiling
 			ship.location.column := 1
+			ship.initial_location.row := ship.location.row
+			ship.initial_location.column := ship.location.column
 			create board.make_filled ("",row,column)
 			initialize_board
 		end
@@ -323,39 +338,40 @@ feature --utility operations
 	-----------------------------------------------------------------------------------
 	--ENEMY METHODS
 	--Adding enemy to enemy table
+	--CHECK FOR OCCUPIED POSITIONS
 	add_enemy
 		do
 			generate_random_number
 			if rand2 >= 1 and rand2 < g_threshold then
-				enemy_table.extend (create {GRUNT}.make, enemy_id)
+				enemy_table.extend (create {GRUNT}.make(100,1,1,5), enemy_id)
 				if attached enemy_table.item (enemy_id) as el then
 					el.location := [rand1,column]
 					board.put ("G",rand1, column)
 				end
 				enemy_id := enemy_id + 1
 			elseif rand2 >= g_threshold and rand2 < f_threshold then
-				enemy_table.extend (create {FIGHTER}.make, enemy_id)
+				enemy_table.extend (create {FIGHTER}.make(150,5,10,10), enemy_id)
 				if attached enemy_table.item (enemy_id) as el then
 					el.location := [rand1,column]
 					board.put ("F",rand1, column)
 				end
 				enemy_id := enemy_id + 1
 			elseif rand2 >= f_threshold and rand2 < c_threshold then
-				enemy_table.extend (create {CARRIER}.make, enemy_id)
+				enemy_table.extend (create {CARRIER}.make(200,10,15,15), enemy_id)
 				if attached enemy_table.item (enemy_id) as el then
 					el.location := [rand1,column]
 					board.put ("C",rand1, column)
 				end
 				enemy_id := enemy_id + 1
 			elseif rand2 >= c_threshold and rand2 < i_threshold then
-				enemy_table.extend (create {INTERCEPTOR}.make, enemy_id)
+				enemy_table.extend (create {INTERCEPTOR}.make(50,0,0,5), enemy_id)
 				if attached enemy_table.item (enemy_id) as el then
 					el.location := [rand1,column]
 					board.put ("I",rand1, column)
 				end
 				enemy_id := enemy_id + 1
 			elseif rand2 >= i_threshold and rand2 < p_threshold then
-				enemy_table.extend (create {PYLON}.make, enemy_id)
+				enemy_table.extend (create {PYLON}.make(300,0,0,5), enemy_id)
 				if attached enemy_table.item (enemy_id) as el then
 					el.location := [rand1,column]
 					board.put ("P",rand1, column)
@@ -389,6 +405,9 @@ apply_regenration
 		if ship.current_energy /= ship.total_energy then
 			ship.current_energy := ship.current_energy + ship.e_regen
 		end
+		if ship.current_energy > ship.total_energy then
+			ship.current_energy := ship.total_energy
+		end
 	end
 
 calculate_fire_cost
@@ -402,6 +421,47 @@ calculate_fire_cost
 				set_error_output_msg (error.fire_resource)
 			end
 		end
+	end
+
+enemy_vision_update
+local
+	i : INTEGER
+	do
+		from i:= 1
+		until
+			i > enemy_id
+		loop
+			if attached enemy_table.item (i) as eti  then
+				eti.update_can_see_starfighter
+			eti.update_seen_by_starfighter
+			end
+
+			i := i+1
+		end
+	end
+enemy_act
+local
+	i : INTEGER
+	do
+
+
+
+		from i:= 1
+		until
+			i > enemy_id
+		loop
+			if attached enemy_table.item (i) as eti  then
+				if eti.can_see_starfighter then
+					eti.action_when_starfighter_is_seen
+				else
+					eti.action_when_starfighter_is_not_seen
+				end
+			end
+
+			i := i+1
+		end
+
+
 	end
 
 
@@ -429,19 +489,23 @@ feature -- model operations
 		end
 
 
-
 	--Displaying info and board
 	display
 		local
 			s :STRING
+--			i:INTEGER
 		do
 			create s.make_empty
-			projectile_display
+--			if friendly_projectile_list.count > 0 then
+--				projectile_display
+--			end
+
 			s.append ("  Starfighter:%N")
 			s.append ("    [0,S]->health:"+ship.current_health.out+"/"+ship.total_health.out+", energy:"+ship.current_energy.out+"/"+ship.total_energy.out+", Regen:"+ship.h_regen.out+"/"+ship.e_regen.out+", Armour:"+ship.armour.out+", Vision:"+ship.vision.out+", Move:"+ship.move.out+", Move Cost:"+ship.move_cost.out+", location:["+row_indexes.item (ship.location.row).out+","+ship.location.column.out+"]%N")
 			s.append ("      Projectile Pattern:"+ship.choice_selected[1].name+", Projectile Damage:"+ship.projectile_damage.out+", Projectile Cost:"+ship.projectile_cost.out+" (energy)%N")
 			s.append ("      Power:"+ship.choice_selected[4].name+"%N")
 			s.append ("      score:0")
+
 
 			if in_toggle_mode then
 				s.append ("%N  Enemy:%N")
@@ -490,6 +554,7 @@ feature -- model operations
 		local
 			fi: FORMAT_INTEGER
 			vision:INTEGER
+			index:INTEGER
 		do
 			create fi.make (2)
 			grid_layout := ""
@@ -497,11 +562,28 @@ feature -- model operations
 			across 1 |..| (enemy_table.count) as et
 			loop
 				if attached enemy_table.item (et.item) as el then
-					if  in_toggle_mode or (vision < ship.vision)  then
+					if  el.location.column >= 1  then
 						board.put (el.symbol,el.location.row,el.location.column)
 					end
 				end
 			end
+
+			from index := -1
+			until
+				index <= projectile_id
+
+					loop
+						if attached enemy_projectile_list.item (index) as el then
+							if  enemy_projectile_list.has (index) and el.location.column >= 1  then
+								board.put ("<", el.location.row,el.location.column)
+							end
+						end
+						index := index-1
+			end
+
+
+
+
 			-- Appending board array to a string
 			grid_layout.append("%N")
 			grid_layout.append ("    ")
@@ -559,14 +641,40 @@ feature -- model operations
 			display
 		end
 	pass
+	local
+		i:INTEGER
 		do
 			error_state_counter := 0 --Reseting error state cursor
 			increment_success_state_counter
 			if friendly_projectile_list.count > 0 then
 				update.update_friendly_projectile
 			end
+			if enemy_projectile_list.count > 0 then
+				update_ep.update_enemy_projectile_location
+			end
+
 			apply_regenration
 			apply_regenration
+			--ENEMY VISION UPDATE
+			if enemy_table.count >0 then
+				enemy_vision_update
+
+
+			--ENEMY ACT
+			from i:= 1
+				until
+					i > enemy_id
+				loop
+					if attached enemy_table.item (i) as eti  then
+						eti.preemptive_action (1)
+					end
+
+					i := i+1
+				end
+				enemy_act
+			--ENEMY VISION UPDATE
+				enemy_vision_update
+			end
 			add_enemy
 			sf_act_display_str := sf_act_display.display_act (3)
 			display
@@ -649,20 +757,74 @@ feature -- model operations
 			--APPLY REGENRATION CHECK COLLIDING VALIDATIONS
 			error_state_counter := 0 --Reseting error state cursor
 			create projectile_move_str.make_empty
+			--FRIENDLY PROJECTILE ACT
 			if friendly_projectile_list.count > 0 then
 				update.update_friendly_projectile
 			end
+			--ENEMY PROJECTILE ACT
+
+			-- STARFIGHTER ACT
 			apply_regenration
 			fire_cmd.fire
+
+			--ENEMY VISION UPDATE
+				enemy_vision_update
+			--ENEMY ACT
+				enemy_act
+			--ENEMY VISION UPDATE
+				enemy_vision_update
+			--ENEMY SPWAN
 			add_enemy
 			calculate_fire_cost
 			if is_error = false then
 				increment_success_state_counter
-
 				display
 			end
 		end
 
+	special
+		do
+			--APPLY REGENRATION CHECK COLLIDING VALIDATIONS
+			error_state_counter := 0 --Reseting error state cursor
+			create projectile_move_str.make_empty
+			--FRIENDLY PROJECTILE ACT
+			if friendly_projectile_list.count > 0 then
+				update.update_friendly_projectile
+			end
+			--ENEMY PROJECTILE ACT
+
+			-- STARFIGHTER ACT
+			apply_regenration
+			inspect ship.choice_selected[4].pos
+			when 1 then
+				ship.location.row := ship.initial_location.row
+				ship.location.column := ship.initial_location.column
+				if ship.current_energy > 50 then
+					ship.current_energy := ship.current_energy - 50
+				else
+					toggle_is_error
+					set_error_output_msg (error.special_resource)
+				end
+
+			else
+
+			end
+
+			--ENEMY VISION UPDATE
+				enemy_vision_update
+			--ENEMY ACT
+				enemy_act
+			--ENEMY VISION UPDATE
+				enemy_vision_update
+			--ENEMY SPWAN
+			add_enemy
+
+			if is_error = false then
+				increment_success_state_counter
+				display
+			end
+
+		end
 
 
 	reset

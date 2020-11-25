@@ -11,34 +11,59 @@ inherit
 create
 	make
 feature
-	make
+	make(h:INTEGER;r:INTEGER;a:INTEGER;v:INTEGER)
 		do
 			create location.default_create
-			health := 0
-			regen := 0
-			armour := 0
-			vision := 0
+			current_health := h
+			total_health := h
+			regen := r
+			armour := a
+			vision := v
+			is_turn_ended := false
+			can_see_Starfighter := false
+			seen_by_Starfighter := false
+			create old_location.default_create
 			create symbol.make_empty
 			symbol := "F"
 		end
 
-	can_see_starfighter
+	update_can_see_starfighter
 		do
 
 		end
-	seen_by_starfighter
+	update_seen_by_starfighter
 		do
 
 		end
-	preemptive_action
+	preemptive_action(sf_act : INTEGER)
 		do
+			inspect
+						sf_act
+					when 1 then
+						-- PASS
+					when 2 then
+						--FIRE
+					when 3 then
+						--SPECIAL
 
+
+					else
+
+					end
 		end
 	action_when_starfighter_is_not_seen
 		do
 
 		end
 	action_when_starfighter_is_seen
+		do
+
+		end
+	move_enemy(steps:INTEGER)
+		do
+
+		end
+	check_for_obstacles(position:TUPLE[row:INTEGER;column:INTEGER])
 		do
 
 		end
