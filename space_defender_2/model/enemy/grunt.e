@@ -11,9 +11,10 @@ inherit
 create
 	make
 feature
-	make(h:INTEGER;r:INTEGER;a:INTEGER;v:INTEGER)
+	make(i_d:INTEGER;h:INTEGER;r:INTEGER;a:INTEGER;v:INTEGER)
 		do
 			create location.default_create
+			id:= i_d
 			current_health := h
 			total_health := h
 			regen := r
@@ -29,28 +30,16 @@ feature
 
 	update_can_see_starfighter
 		local
-			new_vision : INTEGER
+			displacement : INTEGER
 		do
-			new_vision := ((model.m.ship.location.row-Current.location.row.item).abs+(model.m.ship.location.column-Current.location.column.item).abs)
-			new_vision := new_vision.abs
-			if new_vision <= current.vision then
-				can_see_starfighter := true
-			else
-				can_see_starfighter := false
-			end
-
+			can_see_starfighter := ((location.row - model.m.ship.location.row).abs + (location.column - model.m.ship.location.column).abs) <= vision
 		end
 	update_seen_by_starfighter
 		local
-			new_vision : INTEGER
+			displacement : INTEGER
 		do
-			new_vision := ((model.m.ship.location.row-Current.location.row.item).abs+(model.m.ship.location.column-Current.location.column.item).abs)
-			new_vision := new_vision.abs
-			if new_vision <= model.m.ship.vision then
-				seen_by_starfighter := true
-			else
-				seen_by_starfighter := false
-			end
+			seen_by_starfighter := ((location.row - model.m.ship.location.row).abs + (location.column - model.m.ship.location.column).abs) <= model.m.ship.vision
+
 		end
 	preemptive_action(sf_act : INTEGER)
 		do
@@ -60,13 +49,14 @@ feature
 				-- PASS
 				total_health := total_health + 10
 				current_health := current_health + 10
+				model.m.enemy_act_display_str := "%N    A Grunt(id:"+id.out+") gains 10 total health.%N"
 			when 2 then
 				--FIRE
 			when 3 then
 				--SPECIAL
 				total_health := total_health + 20
 				current_health := current_health + 20
-
+				model.m.enemy_act_display_str := "%N    A Grunt(id:"+id.out+") gains 20 total health.%N"
 
 			else
 
@@ -78,8 +68,9 @@ feature
 		do
 			move_enemy(2)
 			if not is_destroyed then
-
+				model.m.enemy_act_display_str.append ("    A Grunt(id:"+id.out+") moves: ["+model.m.row_indexes.item (location.row).out+","+(location.column + 2).out+"] -> ["+model.m.row_indexes.item (location.row).out+","+location.column.out+"]%N")
 				model.m.enemy_projectile_list.put (create {ENEMY_PROJECTILE}.make (model.m.projectile_id, 15, 4,[location.row, (location.column - 1)]), model.m.projectile_id)
+				model.m.enemy_act_display_str.append ("      A enemy projectile(id:"+model.m.projectile_id.out+") spawns at location ["+model.m.row_indexes.item (location.row).out+","+(location.column - 1).out+"].")
 				model.m.projectile_id := model.m.projectile_id - 1
 			end
 		end
@@ -87,8 +78,16 @@ feature
 		do
 			move_enemy(4)
 			if not is_destroyed then
-				model.m.enemy_projectile_list.put (create {ENEMY_PROJECTILE}.make (model.m.projectile_id, 15, 4,[location.row, (location.column - 1)]), model.m.projectile_id)
-				model.m.projectile_id := model.m.projectile_id - 1
+				if location.column >=1 then
+					model.m.enemy_act_display_str.append ("    A Grunt(id:"+id.out+") moves: ["+model.m.row_indexes.item (location.row).out+","+(location.column + 4).out+"] -> ["+model.m.row_indexes.item (location.row).out+","+location.column.out+"]%N")
+					model.m.enemy_projectile_list.put (create {ENEMY_PROJECTILE}.make (model.m.projectile_id, 15, 4,[location.row, (location.column - 1)]), model.m.projectile_id)
+					model.m.enemy_act_display_str.append ("      A enemy projectile(id:"+model.m.projectile_id.out+") spawns at location ["+model.m.row_indexes.item (location.row).out+","+(location.column - 1).out+"].%N")
+					model.m.projectile_id := model.m.projectile_id - 1
+				else
+					model.m.enemy_act_display_str.append ("    A Grunt(id:"+id.out+") moves: ["+model.m.row_indexes.item (location.row).out+","+(location.column + 4).out+"] -> out of board")
+					model.m.enemy_table.remove (id)
+				end
+
 			end
 		end
 	move_enemy(steps:INTEGER)

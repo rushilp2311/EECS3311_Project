@@ -49,7 +49,7 @@ feature
 	fire_standard
 		do
 
-				model.m.friendly_projectile_list.extend (create{FRIENDLY_PROJECTILE}.make, model.m.projectile_id)
+				model.m.friendly_projectile_list.extend (create{FRIENDLY_PROJECTILE}.make(model.m.projectile_id,model.m.ship.projectile_damage,5,[model.m.ship.location.row, model.m.ship.location.column+1]), model.m.projectile_id)
 				if attached model.m.friendly_projectile_list.item (model.m.projectile_id) as fp then
 					fp.id := model.m.projectile_id
 					fp.location := [model.m.ship.location.row, model.m.ship.location.column+1]
@@ -64,7 +64,7 @@ feature
 	fire_spread
 		do
 
-				model.m.friendly_projectile_list.extend (create{FRIENDLY_PROJECTILE}.make, model.m.projectile_id)
+				model.m.friendly_projectile_list.extend (create{FRIENDLY_PROJECTILE}.make(model.m.projectile_id,model.m.ship.projectile_damage,1,[model.m.ship.location.row, model.m.ship.location.column+1]), model.m.projectile_id)
 				if attached model.m.friendly_projectile_list.item (model.m.projectile_id) as fp then
 					fp.id := model.m.projectile_id
 					fp.location := [model.m.ship.location.row, model.m.ship.location.column+1]
@@ -73,7 +73,7 @@ feature
 				end
 
 
-				model.m.friendly_projectile_list.extend (create{FRIENDLY_PROJECTILE}.make, model.m.projectile_id)
+				model.m.friendly_projectile_list.extend (create{FRIENDLY_PROJECTILE}.make(model.m.projectile_id,model.m.ship.projectile_damage,1,[model.m.ship.location.row-1, model.m.ship.location.column+1]), model.m.projectile_id)
 				if attached model.m.friendly_projectile_list.item (model.m.projectile_id) as fp then
 					fp.id := model.m.projectile_id
 					fp.location := [model.m.ship.location.row-1, model.m.ship.location.column+1]
@@ -82,7 +82,7 @@ feature
 				end
 
 
-				model.m.friendly_projectile_list.extend (create{FRIENDLY_PROJECTILE}.make, model.m.projectile_id)
+				model.m.friendly_projectile_list.extend (create{FRIENDLY_PROJECTILE}.make(model.m.projectile_id,model.m.ship.projectile_damage,1,[model.m.ship.location.row+1, model.m.ship.location.column+1]), model.m.projectile_id)
 				if attached model.m.friendly_projectile_list.item (model.m.projectile_id) as fp then
 					fp.id := model.m.projectile_id
 					fp.location := [model.m.ship.location.row+1, model.m.ship.location.column+1]
@@ -101,7 +101,7 @@ feature
 	fire_rocket
 		do
 
-			model.m.friendly_projectile_list.extend (create{FRIENDLY_PROJECTILE}.make, model.m.projectile_id)
+			model.m.friendly_projectile_list.extend (create{FRIENDLY_PROJECTILE}.make(model.m.projectile_id,model.m.ship.projectile_damage,1,[model.m.ship.location.row-1, model.m.ship.location.column-1]), model.m.projectile_id)
 			if attached model.m.friendly_projectile_list.item (model.m.projectile_id) as fp then
 				fp.id := model.m.projectile_id
 				fp.location := [model.m.ship.location.row-1, model.m.ship.location.column-1]
@@ -110,7 +110,7 @@ feature
 			end
 
 
-			model.m.friendly_projectile_list.extend (create{FRIENDLY_PROJECTILE}.make, model.m.projectile_id)
+			model.m.friendly_projectile_list.extend (create{FRIENDLY_PROJECTILE}.make(model.m.projectile_id,model.m.ship.projectile_damage,1,[model.m.ship.location.row+1, model.m.ship.location.column-1]), model.m.projectile_id)
 			if attached model.m.friendly_projectile_list.item (model.m.projectile_id) as fp then
 				fp.id := model.m.projectile_id
 				fp.location := [model.m.ship.location.row+1, model.m.ship.location.column-1]

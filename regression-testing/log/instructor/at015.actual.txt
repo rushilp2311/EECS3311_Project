@@ -54,6 +54,7 @@
       Power:Recall (50 energy): Teleport back to spawn.
       score:0
   Enemy:
+    [1,G]->health:100/100, Regen:1, Armour:1, Vision:5, seen_by_Starfighter:F, can_see_Starfighter:F, location:[A,30]
   Projectile:
   Friendly Projectile Action:
   Enemy Projectile Action:
@@ -61,6 +62,7 @@
     The Starfighter(id:0) passes at location [E,1], doubling regen rate.
   Enemy Action:
   Natural Enemy Spawn:
+    A Grunt(id:1) spawns at location [A,30].
       1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
     A _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  G
     B _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _
@@ -80,13 +82,20 @@
       Power:Recall (50 energy): Teleport back to spawn.
       score:0
   Enemy:
+    [1,G]->health:110/110, Regen:1, Armour:1, Vision:5, seen_by_Starfighter:F, can_see_Starfighter:F, location:[A,28]
+    [2,G]->health:100/100, Regen:1, Armour:1, Vision:5, seen_by_Starfighter:F, can_see_Starfighter:F, location:[A,30]
   Projectile:
+    [-1,<]->damage:15, move:4, location:[A,27]
   Friendly Projectile Action:
   Enemy Projectile Action:
   Starfighter Action:
     The Starfighter(id:0) passes at location [E,1], doubling regen rate.
   Enemy Action:
+    A Grunt(id:1) gains 10 total health.
+    A Grunt(id:1) moves: [A,30] -> [A,28]
+      A enemy projectile(id:-1) spawns at location [A,27].
   Natural Enemy Spawn:
+    A Grunt(id:2) spawns at location [A,30].
       1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
     A _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  <  G  _  G
     B _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _
@@ -106,12 +115,23 @@
       Power:Recall (50 energy): Teleport back to spawn.
       score:0
   Enemy:
+    [1,G]->health:120/120, Regen:1, Armour:1, Vision:5, seen_by_Starfighter:F, can_see_Starfighter:F, location:[A,26]
+    [2,G]->health:110/110, Regen:1, Armour:1, Vision:5, seen_by_Starfighter:F, can_see_Starfighter:F, location:[A,28]
+    [3,I]->health:50/50, Regen:0, Armour:0, Vision:5, seen_by_Starfighter:F, can_see_Starfighter:F, location:[H,30]
   Projectile:
+    [-1,<]->damage:15, move:4, location:[A,23]
+    [-2,<]->damage:15, move:4, location:[A,25]
+    [-3,<]->damage:15, move:4, location:[A,27]
   Friendly Projectile Action:
   Enemy Projectile Action:
+    A enemy projectile(id:-1) moves: [A,27] -> [A,23]
   Starfighter Action:
     The Starfighter(id:0) passes at location [E,1], doubling regen rate.
   Enemy Action:
+    A Grunt(id:2) gains 10 total health.
+    A Grunt(id:1) moves: [A,28] -> [A,26]
+      A enemy projectile(id:-2) spawns at location [A,25].    A Grunt(id:2) moves: [A,30] -> [A,28]
+      A enemy projectile(id:-3) spawns at location [A,27].
   Natural Enemy Spawn:
       1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
     A _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  <  _  <  G  <  G  _  _
@@ -132,13 +152,30 @@
       Power:Recall (50 energy): Teleport back to spawn.
       score:0
   Enemy:
+    [1,G]->health:130/130, Regen:1, Armour:1, Vision:5, seen_by_Starfighter:F, can_see_Starfighter:F, location:[A,24]
+    [2,G]->health:120/120, Regen:1, Armour:1, Vision:5, seen_by_Starfighter:F, can_see_Starfighter:F, location:[A,26]
+    [3,I]->health:50/50, Regen:0, Armour:0, Vision:5, seen_by_Starfighter:F, can_see_Starfighter:F, location:[H,30]
+    [4,G]->health:100/100, Regen:1, Armour:1, Vision:5, seen_by_Starfighter:F, can_see_Starfighter:F, location:[G,30]
   Projectile:
+    [-1,<]->damage:15, move:4, location:[A,19]
+    [-2,<]->damage:15, move:4, location:[A,21]
+    [-3,<]->damage:15, move:4, location:[A,23]
+    [-4,<]->damage:15, move:4, location:[A,23]
+    [-5,<]->damage:15, move:4, location:[A,25]
   Friendly Projectile Action:
   Enemy Projectile Action:
+    A enemy projectile(id:-1) moves: [A,23] -> [A,19]
+    A enemy projectile(id:-2) moves: [A,25] -> [A,21]
+    A enemy projectile(id:-3) moves: [A,27] -> [A,23]
   Starfighter Action:
     The Starfighter(id:0) passes at location [E,1], doubling regen rate.
   Enemy Action:
+    A Grunt(id:2) gains 10 total health.
+    A Grunt(id:1) moves: [A,26] -> [A,24]
+      A enemy projectile(id:-4) spawns at location [A,23].    A Grunt(id:2) moves: [A,28] -> [A,26]
+      A enemy projectile(id:-5) spawns at location [A,25].
   Natural Enemy Spawn:
+    A Grunt(id:4) spawns at location [G,30].
       1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
     A _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  <  _  <  _  <  G  <  G  _  _  _  _
     B _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _
@@ -158,12 +195,35 @@
       Power:Recall (50 energy): Teleport back to spawn.
       score:0
   Enemy:
+    [1,G]->health:140/140, Regen:1, Armour:1, Vision:5, seen_by_Starfighter:F, can_see_Starfighter:F, location:[A,22]
+    [2,G]->health:130/130, Regen:1, Armour:1, Vision:5, seen_by_Starfighter:F, can_see_Starfighter:F, location:[A,24]
+    [3,I]->health:50/50, Regen:0, Armour:0, Vision:5, seen_by_Starfighter:F, can_see_Starfighter:F, location:[H,30]
+    [4,G]->health:110/110, Regen:1, Armour:1, Vision:5, seen_by_Starfighter:F, can_see_Starfighter:F, location:[G,28]
+    [5,I]->health:50/50, Regen:0, Armour:0, Vision:5, seen_by_Starfighter:F, can_see_Starfighter:F, location:[D,30]
   Projectile:
+    [-1,<]->damage:15, move:4, location:[A,15]
+    [-2,<]->damage:15, move:4, location:[A,17]
+    [-3,<]->damage:15, move:4, location:[A,19]
+    [-4,<]->damage:15, move:4, location:[A,19]
+    [-5,<]->damage:15, move:4, location:[A,21]
+    [-6,<]->damage:15, move:4, location:[A,21]
+    [-7,<]->damage:15, move:4, location:[A,23]
+    [-8,<]->damage:15, move:4, location:[G,27]
   Friendly Projectile Action:
   Enemy Projectile Action:
+    A enemy projectile(id:-1) moves: [A,19] -> [A,15]
+    A enemy projectile(id:-2) moves: [A,21] -> [A,17]
+    A enemy projectile(id:-3) moves: [A,23] -> [A,19]
+    A enemy projectile(id:-4) moves: [A,23] -> [A,19]
+    A enemy projectile(id:-5) moves: [A,25] -> [A,21]
   Starfighter Action:
     The Starfighter(id:0) passes at location [E,1], doubling regen rate.
   Enemy Action:
+    A Grunt(id:4) gains 10 total health.
+    A Grunt(id:1) moves: [A,24] -> [A,22]
+      A enemy projectile(id:-6) spawns at location [A,21].    A Grunt(id:2) moves: [A,26] -> [A,24]
+      A enemy projectile(id:-7) spawns at location [A,23].    A Grunt(id:4) moves: [G,30] -> [G,28]
+      A enemy projectile(id:-8) spawns at location [G,27].
   Natural Enemy Spawn:
       1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
     A _  _  _  _  _  _  _  _  _  _  _  _  _  _  <  _  <  _  <  _  <  G  <  G  _  _  _  _  _  _
@@ -184,23 +244,51 @@
       Power:Recall (50 energy): Teleport back to spawn.
       score:0
   Enemy:
+    [1,G]->health:140/140, Regen:1, Armour:1, Vision:5, seen_by_Starfighter:F, can_see_Starfighter:F, location:[A,20]
+    [2,G]->health:130/130, Regen:1, Armour:1, Vision:5, seen_by_Starfighter:F, can_see_Starfighter:F, location:[A,22]
+    [3,I]->health:50/50, Regen:0, Armour:0, Vision:5, seen_by_Starfighter:F, can_see_Starfighter:F, location:[H,30]
+    [4,G]->health:110/110, Regen:1, Armour:1, Vision:5, seen_by_Starfighter:F, can_see_Starfighter:F, location:[G,26]
+    [5,I]->health:50/50, Regen:0, Armour:0, Vision:5, seen_by_Starfighter:F, can_see_Starfighter:F, location:[D,30]
+    [6,I]->health:50/50, Regen:0, Armour:0, Vision:5, seen_by_Starfighter:F, can_see_Starfighter:F, location:[F,30]
   Projectile:
+    [-1,<]->damage:15, move:4, location:[A,11]
+    [-2,<]->damage:15, move:4, location:[A,13]
+    [-3,<]->damage:15, move:4, location:[A,15]
+    [-4,<]->damage:15, move:4, location:[A,15]
+    [-5,<]->damage:15, move:4, location:[A,17]
+    [-6,<]->damage:15, move:4, location:[A,17]
+    [-7,<]->damage:15, move:4, location:[A,19]
+    [-8,<]->damage:15, move:4, location:[G,23]
     [-9,*]->damage:70, move:5, location:[E,2]
+    [-10,<]->damage:15, move:4, location:[A,19]
+    [-11,<]->damage:15, move:4, location:[A,21]
+    [-12,<]->damage:15, move:4, location:[G,25]
   Friendly Projectile Action:
   Enemy Projectile Action:
+    A enemy projectile(id:-1) moves: [A,15] -> [A,11]
+    A enemy projectile(id:-2) moves: [A,17] -> [A,13]
+    A enemy projectile(id:-3) moves: [A,19] -> [A,15]
+    A enemy projectile(id:-4) moves: [A,19] -> [A,15]
+    A enemy projectile(id:-5) moves: [A,21] -> [A,17]
+    A enemy projectile(id:-6) moves: [A,21] -> [A,17]
+    A enemy projectile(id:-7) moves: [A,23] -> [A,19]
+    A enemy projectile(id:-8) moves: [G,27] -> [G,23]
   Starfighter Action:
     The Starfighter(id:0) fires at location [E,1].
       A friendly projectile(id:-9) spawns at location [E,2].
-  Enemy Action:
+  Enemy Action:    A Grunt(id:1) moves: [A,22] -> [A,20]
+      A enemy projectile(id:-10) spawns at location [A,19].    A Grunt(id:2) moves: [A,24] -> [A,22]
+      A enemy projectile(id:-11) spawns at location [A,21].    A Grunt(id:4) moves: [G,28] -> [G,26]
+      A enemy projectile(id:-12) spawns at location [G,25].
   Natural Enemy Spawn:
       1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
-    A _  _  _  _  _  _  _  _  _  _  _  _  _  _  <  _  <  _  <  G  <  G  <  _  _  _  _  _  _  _
+    A _  _  _  _  _  _  _  _  _  _  <  _  <  _  <  _  <  _  <  G  <  G  _  _  _  _  _  _  _  _
     B _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _
     C _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _
     D _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  I
     E S  *  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _
     F _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  I
-    G _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  <  G  <  _  _  _
+    G _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  <  _  <  G  _  _  _  _
     H _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  I
     I _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _
     J _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _

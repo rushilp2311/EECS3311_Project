@@ -8,6 +8,7 @@ deferred class
 	ENEMY
 
 feature --Attributes
+	id:INTEGER assign set_id
 	location : TUPLE[row:INTEGER;column:INTEGER] assign set_location
 	old_location : TUPLE[row:INTEGER;column:INTEGER] assign set_old_location
 	total_health : INTEGER assign set_total_health
@@ -23,6 +24,10 @@ feature --Attributes
 	is_destroyed : BOOLEAN assign set_is_destroyed
 
 feature
+	set_id(i:INTEGER)
+		do
+			id:=i
+		end
 
 	set_is_destroyed (sid : BOOLEAN)
 		do

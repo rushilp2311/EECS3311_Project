@@ -61,6 +61,10 @@ feature {NONE} -- Initialization
 			create projectile_list_display_str.make_empty
 			create projectile_move_str.make_empty
 			create update_ep.make
+			create enemy_display_str.make_empty
+			create enemy_act_display_str.make_empty
+			create enemy_spawn_str.make_empty
+			create enemy_projectile_move_str.make_empty
 			----------------
 			set_state_items
 
@@ -100,10 +104,16 @@ feature -- model attributes
 	fire_cmd : FIRE
 	update : UPDATE_PROJECTILE
 	sf_act_display_str : STRING assign set_sf_act_display_str
+	enemy_display_str:STRING assign set_enemy_display_str
 	sf_act_display : STARFIGHTER_ACT_DISPLAY
 	projectile_list_display_str : STRING
 	projectile_move_str:STRING
 	update_ep : UPDATE_ENEMY_PROJECTILE
+	enemy_act_display_str :STRING assign set_enemy_act_display_str
+	enemy_spawn_str : STRING assign set_enemy_spawn
+	enemy_projectile_move_str :STRING
+
+
 
 
 	--Enemy attributes
@@ -120,10 +130,10 @@ feature -- model attributes
 
 
 	--Friendly Projectile Table
-	friendly_projectile_list : HASH_TABLE[FRIENDLY_PROJECTILE,INTEGER]
+	friendly_projectile_list : HASH_TABLE[PROJECTILE,INTEGER]
 
 	projectile_id:INTEGER assign set_projectile_id
-	enemy_projectile_list : HASH_TABLE[ENEMY_PROJECTILE,INTEGER]
+	enemy_projectile_list : HASH_TABLE[PROJECTILE,INTEGER]
 
 
 feature --utility operations
@@ -154,6 +164,22 @@ feature --utility operations
 	toggle_toggle_mode
 		do
 			in_toggle_mode := not in_toggle_mode
+		end
+
+	set_enemy_spawn(ses:STRING)
+		do
+			enemy_spawn_str := ses
+		end
+
+	set_enemy_act_display_str(eacds: STRING)
+		do
+			enemy_act_display_str := eacds
+		end
+
+
+	set_enemy_display_str(eds :STRING)
+		do
+			enemy_display_str :=eds
 		end
 
 	set_projectile_id(spi:INTEGER)
@@ -343,10 +369,13 @@ feature --utility operations
 		do
 			generate_random_number
 			if rand2 >= 1 and rand2 < g_threshold then
-				enemy_table.extend (create {GRUNT}.make(100,1,1,5), enemy_id)
+				enemy_table.extend (create {GRUNT}.make(enemy_id,100,1,1,5), enemy_id)
 				if attached enemy_table.item (enemy_id) as el then
+					enemy_spawn_str.append ("    A Grunt(id:"+enemy_id.out+") spawns at location ["+row_indexes.item (rand1).out+","+column.out+"].")
+
 					el.location := [rand1,column]
 					board.put ("G",rand1, column)
+					enemy_vision_update
 				end
 				enemy_id := enemy_id + 1
 			elseif rand2 >= g_threshold and rand2 < f_threshold then
@@ -433,7 +462,7 @@ local
 		loop
 			if attached enemy_table.item (i) as eti  then
 				eti.update_can_see_starfighter
-			eti.update_seen_by_starfighter
+				eti.update_seen_by_starfighter
 			end
 
 			i := i+1
@@ -467,22 +496,63 @@ local
 
 feature -- model operations
 
+	enemy_display
+	local
+		i : INTEGER
+		ss:STRING
+		css:STRING
+	do
+
+
+
+		from i:= 1
+		until
+			i > enemy_id
+		loop
+
+			if attached enemy_table.item (i) as eti  then
+				if eti.seen_by_starfighter = true then
+					ss := "T"
+				else
+					ss := "F"
+				end
+				if eti.can_see_starfighter = true then
+					css := "T"
+				else
+					css := "F"
+				end
+				enemy_display_str.append ("    ["+i.out+","+eti.symbol+"]->health:"+eti.current_health.out+"/"+eti.total_health.out+", Regen:"+eti.regen.out+", Armour:"+eti.armour.out+", Vision:"+eti.vision.out+", seen_by_Starfighter:"+ss+", can_see_Starfighter:"+css+", location:["+row_indexes.item(eti.location.row).out+","+eti.location.column.out+"]%N")
+			end
+
+			i := i+1
+		end
+
+		end
+
 
 	projectile_display
 	local
 		i :INTEGER
+		temp_table : HASH_TABLE[PROJECTILE,INTEGER]
 		do
 			create projectile_list_display_str.make_empty
+			create temp_table.make (200)
+			if friendly_projectile_list.count > 0 then
+				temp_table.copy (friendly_projectile_list)
+			end
+			if enemy_projectile_list.count > 0 then
+				temp_table.merge (enemy_projectile_list)
+			end
+
 			from i := -1
 			until
 				i < projectile_id
 			loop
-				if friendly_projectile_list.has (i) then
-					if attached friendly_projectile_list.item (i) as fp then
-						projectile_list_display_str.append ("    ["+i.out+",*]->damage:"+fp.damage.out+", move:"+ship.projectile_cost.out+", location:["+row_indexes.item(fp.location.row).out+","+fp.location.column.out+"]%N")
+				if temp_table.has (i) then
+					if attached temp_table.item (i) as fp then
+						projectile_list_display_str.append ("    ["+i.out+","+fp.symbol+"]->damage:"+fp.damage.out+", move:"+fp.move_update.out+", location:["+row_indexes.item(fp.location.row).out+","+fp.location.column.out+"]%N")
 					end
 				end
-
 
 				i := i - 1
 			end
@@ -496,8 +566,11 @@ feature -- model operations
 --			i:INTEGER
 		do
 			create s.make_empty
-			if friendly_projectile_list.count > 0 then
+
 				projectile_display
+
+			if enemy_table.count > 0 then
+				enemy_display
 			end
 
 			s.append ("  Starfighter:%N")
@@ -509,21 +582,31 @@ feature -- model operations
 
 			if in_toggle_mode then
 				s.append ("%N  Enemy:%N")
+					s.append (enemy_display_str)
 				s.append ("  Projectile:%N")
-				if friendly_projectile_list.count > 0 then
+
 					s.append (projectile_list_display_str)
-				end
+
 
 				s.append ("  Friendly Projectile Action:%N")
 				s.append (projectile_move_str)
 				s.append ("  Enemy Projectile Action:%N")
+				s.append (enemy_projectile_move_str)
 				s.append ("  Starfighter Action:%N")
 				if success_state_counter > 0 then
 					s.append ("    "+sf_act_display_str+"%N")
 				end
 
-				s.append ("  Enemy Action:%N")
-				s.append ("  Natural Enemy Spawn:")
+				s.append ("  Enemy Action:")
+				if not enemy_act_display_str.is_empty then
+					s.append (enemy_act_display_str)
+				end
+				s.append ("%N  Natural Enemy Spawn:")
+				if not enemy_spawn_str.is_empty then
+					s.append ("%N"+enemy_spawn_str)
+					create enemy_spawn_str.make_empty
+				end
+
 			end
 
 
@@ -646,6 +729,9 @@ feature -- model operations
 		do
 			error_state_counter := 0 --Reseting error state cursor
 			increment_success_state_counter
+			create enemy_projectile_move_str.make_empty
+			create enemy_display_str.make_empty
+			create enemy_act_display_str.make_empty
 			if friendly_projectile_list.count > 0 then
 				update.update_friendly_projectile
 			end
@@ -757,11 +843,17 @@ feature -- model operations
 			--APPLY REGENRATION CHECK COLLIDING VALIDATIONS
 			error_state_counter := 0 --Reseting error state cursor
 			create projectile_move_str.make_empty
+			create enemy_display_str.make_empty
+			create enemy_projectile_move_str.make_empty
+			create enemy_act_display_str.make_empty
 			--FRIENDLY PROJECTILE ACT
 			if friendly_projectile_list.count > 0 then
 				update.update_friendly_projectile
 			end
 			--ENEMY PROJECTILE ACT
+			if enemy_projectile_list.count > 0 then
+				update_ep.update_enemy_projectile_location
+			end
 
 			-- STARFIGHTER ACT
 			apply_regenration
@@ -783,15 +875,23 @@ feature -- model operations
 		end
 
 	special
+		local
+			i :INTEGER
 		do
 			--APPLY REGENRATION CHECK COLLIDING VALIDATIONS
 			error_state_counter := 0 --Reseting error state cursor
 			create projectile_move_str.make_empty
+			create enemy_projectile_move_str.make_empty
+			create enemy_display_str.make_empty
+			create enemy_act_display_str.make_empty
 			--FRIENDLY PROJECTILE ACT
 			if friendly_projectile_list.count > 0 then
 				update.update_friendly_projectile
 			end
 			--ENEMY PROJECTILE ACT
+			if enemy_projectile_list.count > 0 then
+				update_ep.update_enemy_projectile_location
+			end
 
 			-- STARFIGHTER ACT
 			apply_regenration
@@ -815,13 +915,25 @@ feature -- model operations
 
 			end
 
-			--ENEMY VISION UPDATE
+			if enemy_table.count >0 then
 				enemy_vision_update
+
+
 			--ENEMY ACT
+			from i:= 1
+				until
+					i > enemy_id
+				loop
+					if attached enemy_table.item (i) as eti  then
+						eti.preemptive_action (3)
+					end
+
+					i := i+1
+				end
 				enemy_act
 			--ENEMY VISION UPDATE
 				enemy_vision_update
-			--ENEMY SPWAN
+			end
 			add_enemy
 
 			if is_error = false then

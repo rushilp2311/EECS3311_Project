@@ -42,13 +42,13 @@ feature
 									j := j + 1
 								end
 						 		if fp.location.column >= 1  then
---						 			model.m.projectile_move_str.append ("    A friendly projectile(id:"+i.out+") moves: ["+model.m.row_indexes.item (fp.location.row).out+","+(fp.location.column-5).out+"] -> ["+model.m.row_indexes.item (fp.location.row).out+","+fp.location.column.out+"]%N")
+						 			model.m.enemy_projectile_move_str.append ("    A enemy projectile(id:"+i.out+") moves: ["+model.m.row_indexes.item (fp.location.row).out+","+(fp.location.column+fp.move_update).out+"] -> ["+model.m.row_indexes.item (fp.location.row).out+","+fp.location.column.out+"]%N")
 									if  model.m.enemy_projectile_list.has (i.item)   then
 									model.m.board.put ("<",fp.location.row , fp.location.column)
 									end
 						 		else
---						 			model.m.projectile_move_str.append ("    A friendly projectile(id:"+i.out+") moves: ["+model.m.row_indexes.item (fp.location.row).out+","+(fp.location.column-5).out+"] -> out of board%N")
-						 			model.m.friendly_projectile_list.remove (fp.id)
+						 			model.m.enemy_projectile_move_str.append ("    A enemy projectile(id:"+i.out+") moves: ["+model.m.row_indexes.item (fp.location.row).out+","+(fp.location.column+fp.move_update).out+"] -> out of board%N")
+						 			model.m.enemy_projectile_list.remove (fp.id)
 						 		end
 
 							end
