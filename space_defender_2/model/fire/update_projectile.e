@@ -135,8 +135,12 @@ feature
 						fp.location.column := fp.location.column + 8
 						-- Check for collision
 					    if fp.location.column < model.m.board.width  then
+					    	model.m.projectile_move_str.append ("    A friendly projectile(id:"+i.out+") moves: ["+model.m.row_indexes.item (fp.location.row).out+","+(fp.location.column-8).out+"] -> ["+model.m.row_indexes.item (fp.location.row).out+","+fp.location.column.out+"]%N")
+
 							model.m.board.put ("*",fp.location.row , fp.location.column)
 				 		else
+				 			model.m.projectile_move_str.append ("    A friendly projectile(id:"+i.out+") moves: ["+model.m.row_indexes.item (fp.location.row).out+","+(fp.location.column-8).out+"] -> out of board%N")
+
 				 			model.m.friendly_projectile_list.remove (fp.id)
 				 		end
 					end
@@ -146,8 +150,7 @@ feature
 			end
 		end
 	update_rocket
-	local
-		u : REAL_64
+
 		do
 
 			from i := -1
@@ -155,17 +158,20 @@ feature
 					i <= model.m.projectile_id
 				loop
 					if attached model.m.friendly_projectile_list.item (i.item) as fp then
-						u := (2 ^ fp.move_update)
 						model.m.board.put ("_",fp.location.row , fp.location.column)
+						fp.location.column := fp.location.column + fp.move_update
 
-						fp.location.column := fp.location.column + u.ceiling
-						fp.move_update := fp.move_update+1
 						-- Check for collision
 					    if fp.location.column < model.m.board.width  then
+					    	model.m.projectile_move_str.append ("    A friendly projectile(id:"+i.out+") moves: ["+model.m.row_indexes.item (fp.location.row).out+","+(fp.location.column-fp.move_update).out+"] -> ["+model.m.row_indexes.item (fp.location.row).out+","+fp.location.column.out+"]%N")
+
 							model.m.board.put ("*",fp.location.row , fp.location.column)
 				 		else
+				 			model.m.projectile_move_str.append ("    A friendly projectile(id:"+i.out+") moves: ["+model.m.row_indexes.item (fp.location.row).out+","+(fp.location.column-fp.move_update).out+"] -> out of board%N")
+
 				 			model.m.friendly_projectile_list.remove (fp.id)
 				 		end
+				 		fp.move_update := (2* fp.move_update)
 					end
 
 					i := i - 1

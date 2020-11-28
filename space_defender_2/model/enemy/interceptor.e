@@ -11,11 +11,12 @@ inherit
 create
 	make
 feature
-	make(h:INTEGER;r:INTEGER;a:INTEGER;v:INTEGER)
+	make(i_d:INTEGER;h:INTEGER;r:INTEGER;a:INTEGER;v:INTEGER)
 		do
 			create location.default_create
 			current_health := h
 			total_health := h
+			id:= i_d
 			regen := r
 			armour := a
 			vision := v
@@ -53,14 +54,36 @@ feature
 		end
 	action_when_starfighter_is_not_seen
 		do
-
+			move_enemy(3)
+			if not is_destroyed then
+				model.m.enemy_act_display_str.append ("    A Interceptor(id:"+id.out+") moves: ["+model.m.row_indexes.item (location.row).out+","+(location.column + 3).out+"] -> ["+model.m.row_indexes.item (location.row).out+","+location.column.out+"]%N")
+			end
 		end
 	action_when_starfighter_is_seen
 		do
-
+			move_enemy(3)
+			if not is_destroyed then
+				model.m.enemy_act_display_str.append ("    A Interceptor(id:"+id.out+") moves: ["+model.m.row_indexes.item (location.row).out+","+(location.column + 3).out+"] -> ["+model.m.row_indexes.item (location.row).out+","+location.column.out+"]%N")
+			end
 		end
 	move_enemy(steps:INTEGER)
+		local
+			i:INTEGER
+
 		do
+			model.m.board.put ("_", current.location.row, current.location.column)
+			from
+				i:=1
+			until
+				i > steps
+			loop
+				check_for_obstacles (current.location.row,current.location.column - steps)
+				if not is_destroyed then
+					current.location.column := current.location.column - 1
+				end
+				i := i+1
+			end
+			-- CHECK IF OUTSIDE BOARD and delete
 
 		end
 	check_for_obstacles(position:TUPLE[row:INTEGER;column:INTEGER])

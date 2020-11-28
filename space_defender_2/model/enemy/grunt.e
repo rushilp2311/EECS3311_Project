@@ -49,14 +49,14 @@ feature
 				-- PASS
 				total_health := total_health + 10
 				current_health := current_health + 10
-				model.m.enemy_act_display_str := "%N    A Grunt(id:"+id.out+") gains 10 total health.%N"
+				model.m.enemy_act_display_str.append ("    A Grunt(id:"+id.out+") gains 10 total health.%N")
 			when 2 then
 				--FIRE
 			when 3 then
 				--SPECIAL
 				total_health := total_health + 20
 				current_health := current_health + 20
-				model.m.enemy_act_display_str := "%N    A Grunt(id:"+id.out+") gains 20 total health.%N"
+				model.m.enemy_act_display_str.append ("    A Grunt(id:"+id.out+") gains 20 total health.%N")
 
 			else
 
@@ -70,7 +70,7 @@ feature
 			if not is_destroyed then
 				model.m.enemy_act_display_str.append ("    A Grunt(id:"+id.out+") moves: ["+model.m.row_indexes.item (location.row).out+","+(location.column + 2).out+"] -> ["+model.m.row_indexes.item (location.row).out+","+location.column.out+"]%N")
 				model.m.enemy_projectile_list.put (create {ENEMY_PROJECTILE}.make (model.m.projectile_id, 15, 4,[location.row, (location.column - 1)]), model.m.projectile_id)
-				model.m.enemy_act_display_str.append ("      A enemy projectile(id:"+model.m.projectile_id.out+") spawns at location ["+model.m.row_indexes.item (location.row).out+","+(location.column - 1).out+"].")
+				model.m.enemy_act_display_str.append ("      A enemy projectile(id:"+model.m.projectile_id.out+") spawns at location ["+model.m.row_indexes.item (location.row).out+","+(location.column - 1).out+"].%N")
 				model.m.projectile_id := model.m.projectile_id - 1
 			end
 		end
@@ -84,7 +84,7 @@ feature
 					model.m.enemy_act_display_str.append ("      A enemy projectile(id:"+model.m.projectile_id.out+") spawns at location ["+model.m.row_indexes.item (location.row).out+","+(location.column - 1).out+"].%N")
 					model.m.projectile_id := model.m.projectile_id - 1
 				else
-					model.m.enemy_act_display_str.append ("    A Grunt(id:"+id.out+") moves: ["+model.m.row_indexes.item (location.row).out+","+(location.column + 4).out+"] -> out of board")
+					model.m.enemy_act_display_str.append ("    A Grunt(id:"+id.out+") moves: ["+model.m.row_indexes.item (location.row).out+","+(location.column + 4).out+"] -> out of board%N")
 					model.m.enemy_table.remove (id)
 				end
 

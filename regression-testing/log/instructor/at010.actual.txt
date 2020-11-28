@@ -156,25 +156,23 @@
       Power:Recall (50 energy): Teleport back to spawn.
       score:0
   Enemy:
-    [1,G]->health:130/130, Regen:1, Armour:1, Vision:5, seen_by_Starfighter:T, can_see_Starfighter:F, location:[A,6]
-    [1,G]->health:130/130, Regen:1, Armour:1, Vision:5, seen_by_Starfighter:T, can_see_Starfighter:F, location:[A,6]
+    [1,G]->health:130/130, Regen:1, Armour:1, Vision:5, seen_by_Starfighter:T, can_see_Starfighter:F, location:[A,2]
   Projectile:
-    [-1,<]->damage:15, move:4, location:[A,1]
-    [-2,<]->damage:15, move:4, location:[A,3]
-    [-3,<]->damage:15, move:4, location:[A,5]
+    [-3,<]->damage:15, move:4, location:[A,1]
+    [-4,<]->damage:15, move:4, location:[A,1]
   Friendly Projectile Action:
   Enemy Projectile Action:
-    A enemy projectile(id:-1) moves: [A,5] -> [A,1]
-    A enemy projectile(id:-2) moves: [A,7] -> [A,3]
+    A enemy projectile(id:-1) moves: [A,1] -> out of board
+    A enemy projectile(id:-2) moves: [A,3] -> out of board
+    A enemy projectile(id:-3) moves: [A,5] -> [A,1]
   Starfighter Action:
     The Starfighter(id:0) moves: [C,1] -> [A,8]
   Enemy Action:
-    A Grunt(id:1) gains 10 total health.
-    A Grunt(id:1) moves: [A,8] -> [A,6]
-      A enemy projectile(id:-3) spawns at location [A,5].
+    A Grunt(id:1) moves: [A,6] -> [A,2]
+      A enemy projectile(id:-4) spawns at location [A,1].
   Natural Enemy Spawn:
       1  2  3  4  5  6  7  8  9 10 11 12
-    A <  _  <  _  <  G  _  S  _  _  _  _
+    A <  G  _  _  _  _  _  S  _  _  _  _
     B _  _  _  _  _  _  _  _  _  _  _  _
     C _  _  _  _  _  _  _  _  _  _  _  _
     D _  _  _  _  _  _  _  _  _  _  _  _
