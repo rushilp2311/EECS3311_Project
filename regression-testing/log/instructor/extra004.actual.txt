@@ -179,17 +179,13 @@
 ->special
   state:in game(4.0), debug, ok
   Starfighter:
-    [0,S]->health:60/60, energy:123/160, Regen:1/7, Armour:1, Vision:22, Move:12, Move Cost:2, location:[D,9]
+    [0,S]->health:60/60, energy:23/160, Regen:1/7, Armour:1, Vision:22, Move:12, Move Cost:2, location:[D,9]
       Projectile Pattern:Snipe, Projectile Damage:1000, Projectile Cost:20 (energy)
       Power:Deploy Drones (100 energy): Clear all projectiles.
       score:0
   Enemy:
     [1,G]->health:120/120, Regen:1, Armour:1, Vision:5, seen_by_Starfighter:T, can_see_Starfighter:F, location:[A,24]
   Projectile:
-    [-1,*]->damage:1000, move:8, location:[D,26]
-    [-2,<]->damage:15, move:4, location:[A,19]
-    [-3,*]->damage:1000, move:8, location:[D,18]
-    [-4,<]->damage:15, move:4, location:[A,21]
     [-5,<]->damage:15, move:4, location:[A,23]
   Friendly Projectile Action:
     A friendly projectile(id:-1) moves: [D,18] -> [D,26]
@@ -198,16 +194,21 @@
     A enemy projectile(id:-2) moves: [A,23] -> [A,19]
     A enemy projectile(id:-4) moves: [A,25] -> [A,21]
   Starfighter Action:
-      Enemy Action:
+    The Starfighter(id:0) uses special, clearing projectiles with drones.
+      A projectile(id:-1) at location [D,26] has been neutralized.
+      A projectile(id:-2) at location [A,19] has been neutralized.
+      A projectile(id:-3) at location [D,18] has been neutralized.
+      A projectile(id:-4) at location [A,21] has been neutralized.
+  Enemy Action:
     A Grunt(id:1) gains 20 total health.
     A Grunt(id:1) moves: [A,26] -> [A,24]
       A enemy projectile(id:-5) spawns at location [A,23].
   Natural Enemy Spawn:
       1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
-    A _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  <  _  <  _  <  G  _  _  _  _  _  _
+    A _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  <  G  _  _  _  _  _  _
     B _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _
     C _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _
-    D _  _  _  _  _  _  _  _  S  _  _  _  _  _  _  _  _  *  _  _  _  _  _  _  _  *  _  _  _  _
+    D _  _  _  _  _  _  _  _  S  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _
     E _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _
     F _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _
     G _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _

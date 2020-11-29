@@ -889,6 +889,7 @@ feature -- model operations
 	special
 		local
 			i :INTEGER
+			index : INTEGER
 		do
 			--APPLY REGENRATION CHECK COLLIDING VALIDATIONS
 			error_state_counter := 0 --Reseting error state cursor
@@ -919,6 +920,34 @@ feature -- model operations
 				end
 				create sf_act_display_str.make_empty
 				sf_act_display_str.append ("The Starfighter(id:0) uses special, teleporting to: ["+row_indexes.item (ship.initial_location.row).out+","+ship.location.column.out+"]%N")
+
+			when 4 then
+				from index := -1
+				until
+					index <= projectile_id
+				loop
+					if attached enemy_projectile_list.item (index) as el then
+						if  enemy_projectile_list.has (index)  then
+							board.put ("_", el.location.row,el.location.column)
+						end
+					end
+					if attached friendly_projectile_list.item (index) as el then
+						if  friendly_projectile_list.has (index)  then
+							board.put ("_", el.location.row,el.location.column)
+						end
+					end
+					index := index-1
+				end
+
+				if ship.current_energy > 100 then
+					ship.current_energy := ship.current_energy - 100
+				else
+					toggle_is_error
+					set_error_output_msg (error.special_resource)
+				end
+				sf_act_display_str := sf_act_display.display_act (4)
+				create friendly_projectile_list.make (100)
+				create enemy_projectile_list.make (100)
 			else
 
 			end
