@@ -29,14 +29,10 @@ feature
 		end
 
 	update_can_see_starfighter
-		local
-			displacement : INTEGER
 		do
 			can_see_starfighter := ((location.row - model.m.ship.location.row).abs + (location.column - model.m.ship.location.column).abs) <= vision
 		end
 	update_seen_by_starfighter
-		local
-			displacement : INTEGER
 		do
 			seen_by_starfighter := ((location.row - model.m.ship.location.row).abs + (location.column - model.m.ship.location.column).abs) <= model.m.ship.vision
 
@@ -101,25 +97,12 @@ feature
 			until
 				i > steps
 			loop
-				check_for_obstacles (current.location.row,current.location.column - steps)
 				if not is_destroyed then
 					current.location.column := current.location.column - 1
 				end
 				i := i+1
 			end
 			-- CHECK IF OUTSIDE BOARD and delete
-		end
-
-	check_for_obstacles(position:TUPLE[row:INTEGER;column:INTEGER])
-		do
-			--CHECK FOR FRIENDLY_PROJECTILE
-
-			--CHECK FOR ENEMY_PROJECTILE
-
-			--CHECK FOR ENEMY
-
-			--CHECK FOR STARFIGHTER
-
 		end
 
 end

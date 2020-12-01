@@ -46,8 +46,6 @@ feature
 						--FIRE
 					when 3 then
 						--SPECIAL
-
-
 					else
 
 					end
@@ -77,7 +75,6 @@ feature
 			until
 				i > steps
 			loop
-				check_for_obstacles (current.location.row,current.location.column - steps)
 				if not is_destroyed then
 					current.location.column := current.location.column - 1
 				end
@@ -86,9 +83,4 @@ feature
 			-- CHECK IF OUTSIDE BOARD and delete
 
 		end
-	check_for_obstacles(position:TUPLE[row:INTEGER;column:INTEGER])
-		do
-
-		end
-
 end

@@ -23,6 +23,7 @@ feature
 			move_cost := 0
 			projectile_damage := 0
 			projectile_cost := 0
+			is_destroyed := false
 			create initial_location.default_create
 			create location.default_create
 			create old_location.default_create
@@ -51,8 +52,14 @@ feature --attributes
 	location : TUPLE[row:INTEGER_32;column:INTEGER_32] assign set_location
 	initial_location : TUPLE[row:INTEGER_32;column:INTEGER_32] assign set_initial_location
 	old_location : TUPLE[row:INTEGER_32;column:INTEGER_32] assign set_old_location
+	is_destroyed:BOOLEAN assign set_is_destroyed
 
 feature
+
+	set_is_destroyed(sid:BOOLEAN)
+		do
+			is_destroyed := sid
+		end
 
 	set_initial_location(il : TUPLE[row:INTEGER_32;column:INTEGER_32])
 		do
@@ -116,6 +123,21 @@ feature
 	set_projectile_cost(pc : INTEGER)
 		do
 			projectile_cost := pc
+		end
+	empty_attributes
+		do
+			current_health := 0
+			total_health := 0
+			current_energy := 0
+			total_energy := 0
+			h_regen := 0
+			e_regen := 0
+			armour := 0
+			vision := 0
+			move := 0
+			move_cost := 0
+			projectile_damage := 0
+			projectile_cost := 0
 		end
 
 

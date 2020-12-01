@@ -106,7 +106,4 @@ feature --Actions
 	move_enemy(steps:INTEGER)
 		deferred
 		end
-	check_for_obstacles(position:TUPLE[row:INTEGER;column:INTEGER])
-		deferred
-		end
 end

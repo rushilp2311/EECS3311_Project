@@ -27,7 +27,7 @@ feature -- command
 				end
 				if model.cursor > 0 and model.cursor <= 5 then
 
-					model.setup_array[model.cursor].select_choice (1)
+					
 					model.set_success_output_msg (model.setup_array[model.cursor].output)
 				else
 					model.toggle_in_setup

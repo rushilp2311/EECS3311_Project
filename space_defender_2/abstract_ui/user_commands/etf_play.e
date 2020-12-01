@@ -20,7 +20,7 @@ feature -- command
 				model.set_error_output_msg(model.error.play_in_setup)
 			else
 				model.set_parameters (row, column, g_threshold, f_threshold, c_threshold, i_threshold, p_threshold)
-				model.increment_cursor
+				model.cursor := 1
 				model.set_setup_array
 				model.toggle_in_setup
 				model.setup_array[model.cursor].select_choice(model.ship.choice_selected[model.cursor].pos)

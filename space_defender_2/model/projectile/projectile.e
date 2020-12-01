@@ -13,6 +13,12 @@ deferred class
 	location : TUPLE[row:INTEGER;column:INTEGER] assign set_location
 	move_update : INTEGER assign set_move_update
 	symbol : STRING assign set_symbol
+	is_destroyed : BOOLEAN assign set_is_destroyed
+
+	set_is_destroyed(sid:BOOLEAN)
+		do
+			is_destroyed := sid
+		end
 
 	set_symbol(ss:STRING)
 		do

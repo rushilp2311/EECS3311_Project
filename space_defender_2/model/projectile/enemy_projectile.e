@@ -21,6 +21,8 @@ feature
 			create location.default_create
 			location := l
 			symbol := "<"
+			location.compare_objects
+			is_destroyed := false
 		end
 
 end

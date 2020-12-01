@@ -38,18 +38,15 @@ feature
 	preemptive_action(sf_act : INTEGER)
 		do
 			inspect
-						sf_act
-					when 1 then
-						-- PASS
-					when 2 then
-						--FIRE
-					when 3 then
-						--SPECIAL
-
-
-					else
-
-					end
+				sf_act
+			when 1 then
+				-- PASS
+			when 2 then
+				--FIRE
+			when 3 then
+				--SPECIAL
+			else
+			end
 		end
 	action_when_starfighter_is_not_seen
 		do
@@ -60,10 +57,6 @@ feature
 
 		end
 	move_enemy(steps:INTEGER)
-		do
-
-		end
-	check_for_obstacles(position:TUPLE[row:INTEGER;column:INTEGER])
 		do
 
 		end

@@ -75,84 +75,67 @@ feature
 		end
 	update_spread
 		do
-		from i := -1
-					until
-						i <= model.m.projectile_id
-					loop
-							if attached model.m.friendly_projectile_list.item (i.item) as fp then
-							model.m.board.put ("_",fp.location.row , fp.location.column)
-
-							fp.location := [fp.location.row , fp.location.column + 1]
-
-							-- Check for collision
-							if fp.location.column <= model.m.board.width and fp.location.row-1 > 0 then
-								model.m.board.put ("*",fp.location.row , fp.location.column)
-					 		else
-
-					 			model.m.friendly_projectile_list.remove (fp.id)
-					 		end
-						end
-						if attached model.m.friendly_projectile_list.item (i.item - 1) as fp then
-							model.m.board.put ("_",fp.location.row , fp.location.column)
-
-
-							fp.location := [fp.location.row -1 , fp.location.column + 1]
-
-							-- Check for collision
-							if fp.location.column <= model.m.board.width and fp.location.row > 0  then
-								model.m.board.put ("*",fp.location.row , fp.location.column)
-					 		else
-
-					 			model.m.friendly_projectile_list.remove (fp.id)
-					 		end
-						end
-						if attached model.m.friendly_projectile_list.item (i.item - 2) as fp then
-							model.m.board.put ("_",fp.location.row , fp.location.column)
-
-							fp.location := [fp.location.row +1 , fp.location.column + 1]
-							-- Check for collision
-							if fp.location.column <= model.m.board.width  and fp.location.row-1 < model.m.board.height then
-								model.m.board.put ("*",fp.location.row , fp.location.column)
-					 		else
-
-					 			model.m.friendly_projectile_list.remove (fp.id)
-					 		end
-						end
-
-						i := i - 3
-
-				end
-		end
-	update_snipe
-		do
 			from i := -1
 				until
 					i <= model.m.projectile_id
 				loop
-					if attached model.m.friendly_projectile_list.item (i.item) as fp then
-						model.m.board.put ("_",fp.location.row , fp.location.column)
-
-						fp.location.column := fp.location.column + 8
-						-- Check for collision
-					    if fp.location.column < model.m.board.width  then
-					    	model.m.projectile_move_str.append ("    A friendly projectile(id:"+i.out+") moves: ["+model.m.row_indexes.item (fp.location.row).out+","+(fp.location.column-8).out+"] -> ["+model.m.row_indexes.item (fp.location.row).out+","+fp.location.column.out+"]%N")
-
-							model.m.board.put ("*",fp.location.row , fp.location.column)
-				 		else
-				 			model.m.projectile_move_str.append ("    A friendly projectile(id:"+i.out+") moves: ["+model.m.row_indexes.item (fp.location.row).out+","+(fp.location.column-8).out+"] -> out of board%N")
-
-				 			model.m.friendly_projectile_list.remove (fp.id)
-				 		end
+				if attached model.m.friendly_projectile_list.item (i.item) as fp then
+					model.m.board.put ("_",fp.location.row , fp.location.column)
+					fp.location := [fp.location.row , fp.location.column + 1]
+					-- Check for collision
+					if fp.location.column <= model.m.board.width and fp.location.row-1 > 0 then
+						model.m.board.put ("*",fp.location.row , fp.location.column)
+			 		else
+			 			model.m.friendly_projectile_list.remove (fp.id)
+				 	end
+				end
+				if attached model.m.friendly_projectile_list.item (i.item - 1) as fp then
+					model.m.board.put ("_",fp.location.row , fp.location.column)
+					fp.location := [fp.location.row -1 , fp.location.column + 1]
+					-- Check for collision
+					if fp.location.column <= model.m.board.width and fp.location.row > 0  then
+						model.m.board.put ("*",fp.location.row , fp.location.column)
+					 else
+				 		model.m.friendly_projectile_list.remove (fp.id)
 					end
-
-					i := i - 1
-
+				end
+				if attached model.m.friendly_projectile_list.item (i.item - 2) as fp then
+					model.m.board.put ("_",fp.location.row , fp.location.column)
+					fp.location := [fp.location.row +1 , fp.location.column + 1]
+					-- Check for collision
+					if fp.location.column <= model.m.board.width  and fp.location.row-1 < model.m.board.height then
+						model.m.board.put ("*",fp.location.row , fp.location.column)
+			 		else
+			 			model.m.friendly_projectile_list.remove (fp.id)
+			 		end
+			 	end
+				i := i - 3
+			end
+		end
+	update_snipe
+		do
+			from i := -1
+			until
+				i <= model.m.projectile_id
+			loop
+				if attached model.m.friendly_projectile_list.item (i.item) as fp then
+					model.m.board.put ("_",fp.location.row , fp.location.column)
+					fp.location.column := fp.location.column + 8
+					-- Check for collision
+				    if fp.location.column < model.m.board.width  then
+				    	model.m.projectile_move_str.append ("    A friendly projectile(id:"+i.out+") moves: ["+model.m.row_indexes.item (fp.location.row).out+","+(fp.location.column-8).out+"] -> ["+model.m.row_indexes.item (fp.location.row).out+","+fp.location.column.out+"]%N")
+						model.m.board.put ("*",fp.location.row , fp.location.column)
+			 		else
+			 			model.m.projectile_move_str.append ("    A friendly projectile(id:"+i.out+") moves: ["+model.m.row_indexes.item (fp.location.row).out+","+(fp.location.column-8).out+"] -> out of board%N")
+			 			model.m.friendly_projectile_list.remove (fp.id)
+			 		end
+				end
+				i := i - 1
 			end
 		end
 	update_rocket
 
 		do
-
 			from i := -1
 				until
 					i <= model.m.projectile_id
@@ -160,7 +143,6 @@ feature
 					if attached model.m.friendly_projectile_list.item (i.item) as fp then
 						model.m.board.put ("_",fp.location.row , fp.location.column)
 						fp.location.column := fp.location.column + fp.move_update
-
 						-- Check for collision
 					    if fp.location.column < model.m.board.width  then
 					    	model.m.projectile_move_str.append ("    A friendly projectile(id:"+i.out+") moves: ["+model.m.row_indexes.item (fp.location.row).out+","+(fp.location.column-fp.move_update).out+"] -> ["+model.m.row_indexes.item (fp.location.row).out+","+fp.location.column.out+"]%N")
@@ -173,9 +155,7 @@ feature
 				 		end
 				 		fp.move_update := (2* fp.move_update)
 					end
-
 					i := i - 1
-
 			end
 		end
 --	update_splitter
