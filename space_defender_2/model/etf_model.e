@@ -489,10 +489,12 @@ local
 			i > enemy_id
 		loop
 			if attached enemy_table.item (i) as eti  then
-				if eti.can_see_starfighter then
-					eti.action_when_starfighter_is_seen
-				else
-					eti.action_when_starfighter_is_not_seen
+				if eti.is_turn_ended = false then
+					if eti.can_see_starfighter then
+						eti.action_when_starfighter_is_seen
+					else
+						eti.action_when_starfighter_is_not_seen
+					end
 				end
 			end
 
@@ -752,10 +754,11 @@ feature -- model operations
 	move(move_row:INTEGER;move_column:INTEGER)
 		local
 			j,k,check_id:INTEGER
+			collision_string : STRING
 		do
 			ship.old_location := ship.location
 			error_state_counter := 0 --Reseting error state cursor
-
+			create collision_string.make_empty
 			--FRIENDLY PROJECTILE ACT
 			if friendly_projectile_list.count > 0 then
 				update.update_friendly_projectile
@@ -767,53 +770,99 @@ feature -- model operations
 
 			-- STARFIGHTER ACT
 			apply_regenration
-			if ship.location.row < move_row  then
+			--move down in same column
+			if (ship.location.row < move_row) and (ship.is_destroyed = false) then
 				from
 					j:= ship.location.row
 				until
 					j > move_row
 				loop
-					
 					ship.location := [j,ship.location.column]
+					check_id := collision.check_for_collision (ship.location, 0, 2)
+					if ship.is_destroyed then
+						-- Put X on the location of starfigther
+						board.put ("_", ship.old_location.row, ship.old_location.column)
+						board.put ("X", ship.location.row, ship.location.column)
+						j := move_row + 1
+					else
+
+
+					end
+
 					j:=j+1
 				end
 
 			end
 
 			-- move up in same column
-			if ship.location.row > move_row  then
+			if (ship.location.row > move_row) and (ship.is_destroyed = false) then
 				from
 					j := ship.location.row
 				until
 					j < move_row
 				loop
-					ship.location := [j  , ship.location.column]
+					ship.location := [j,ship.location.column]
+					check_id := collision.check_for_collision (ship.location, 0, 2)
+					if ship.is_destroyed then
+						-- Put X on the location of starfigther
+						board.put ("_", ship.old_location.row, ship.old_location.column)
+						board.put ("X", ship.location.row, ship.location.column)
+						j := move_row -1
+					else
+
+
+					end
 					j := j - 1
 				end
 			end
 
 			-- move right in same row
-			if ship.location.column < move_column then
-				across
-					(ship.location.column + 1) |..| (move_column)   is index
+			if (ship.location.column < move_column) and (ship.is_destroyed = false) then
+
+				from
+					k := ship.location.column + 1
+				until
+					k > move_column
 				loop
-					ship.location := [ship.location.row, index]
+					ship.location := [ship.location.row, k]
+					check_id := collision.check_for_collision ([ship.location.row, k], 0, 2)
+					if ship.is_destroyed then
+						-- Put X on the location of starfigther
+						board.put ("_", ship.old_location.row, ship.old_location.column)
+						board.put ("X", ship.location.row, ship.location.column)
+						k := k + move_column +1
+					else
+
+					end
+					k := k + 1
 				end
 			end
 
 			-- move left in same row
-			if ship.location.column >  move_column then
+			if (ship.location.column >  move_column) and (ship.is_destroyed = false)then
 				from
 					k := ship.location.column
 				until
 					k < move_column
 				loop
 					ship.location := [ship.location.row, k]
+					check_id := collision.check_for_collision ([ship.location.row, k], 0, 2)
+					if ship.is_destroyed then
+						-- Put X on the location of starfigther
+						board.put ("_", ship.old_location.row, ship.old_location.column)
+						board.put ("X", ship.location.row, ship.location.column)
+					else
+
+
+					end
 					k := k - 1
 				end
 			end
-			board.put ("_", ship.old_location.row, ship.old_location.column)
-			board.put ("S", ship.location.row, ship.location.column)
+			if  (ship.is_destroyed = false) then
+				board.put ("_", ship.old_location.row, ship.old_location.column)
+				board.put ("S", ship.location.row, ship.location.column)
+			end
+
 			calculate_move_cost ((ship.location.row - ship.old_location.row).abs + (ship.location.column - ship.old_location.column).abs)
 			--ENEMY VISION UPDATE
 				enemy_vision_update
@@ -821,15 +870,23 @@ feature -- model operations
 				enemy_act
 			--ENEMY VISION UPDATE
 				enemy_vision_update
-			if is_error = false then
+			if (is_error = false) then
 				increment_success_state_counter
-				--ENEMY SPWAN
-				add_enemy
-				sf_act_display_str := sf_act_display.display_act (1)
+
+				if (ship.is_destroyed = false)  then
+					--ENEMY SPWAN
+					add_enemy
+				else
+					cursor := 0
+				end
+				sf_act_display_str.prepend (sf_act_display.display_act (1))
 				display
 			end
+
 		end
 	fire
+	local
+		i :INTEGER
 		do
 			--CHECK COLLIDING VALIDATIONS
 			error_state_counter := 0 --Reseting error state cursor
@@ -848,7 +905,17 @@ feature -- model operations
 			--ENEMY VISION UPDATE
 			enemy_vision_update
 			--ENEMY ACT
-			enemy_act
+			from i:= 1
+				until
+					i > enemy_id
+				loop
+					if attached enemy_table.item (i) as eti  then
+						eti.preemptive_action (2)
+					end
+
+					i := i+1
+				end
+				enemy_act
 			--ENEMY VISION UPDATE
 			enemy_vision_update
 			--ENEMY SPWAN
@@ -1002,6 +1069,10 @@ feature -- queries
 
 			else
 				Result.append (output_msg)
+				if ship.is_destroyed then
+					Result.append ("%N  The game is over. Better luck next time!")
+				end
+
 				output_msg:=""
 			end
 			create projectile_move_str.make_empty

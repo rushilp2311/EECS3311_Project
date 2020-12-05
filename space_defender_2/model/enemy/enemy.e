@@ -22,8 +22,16 @@ feature --Attributes
 	is_turn_ended : BOOLEAN assign set_is_turn_ended
 	model : ETF_MODEL_ACCESS
 	is_destroyed : BOOLEAN assign set_is_destroyed
+	name : STRING assign set_name
 
 feature
+
+	set_name(sn : STRING)
+		do
+			name := sn
+		end
+
+
 	set_id(i:INTEGER)
 		do
 			id:=i

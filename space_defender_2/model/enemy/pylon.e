@@ -26,14 +26,38 @@ feature
 			create old_location.default_create
 			create symbol.make_empty
 			symbol := "P"
+			name := "Pylon"
+		end
+
+	heal_enemies
+	local
+		i :INTEGER
+		do
+			from
+				i := 1
+			until
+				i > model.m.enemy_id
+			loop
+				if attached model.m.enemy_table.item (i) as e then
+					if ((location.row - e.location.row).abs + (location.column - e.location.column).abs) <= vision then
+						e.current_health := e.current_health + 10
+						if e.current_health > e.total_health then
+							e.current_health := e.total_health
+						end
+					end
+				end
+
+				i:= i+1
+			end
 		end
 
 	update_can_see_starfighter
 		do
-
+			can_see_starfighter := ((location.row - model.m.ship.location.row).abs + (location.column - model.m.ship.location.column).abs) <= vision
 		end
 	update_seen_by_starfighter
 		do
+			seen_by_starfighter := ((location.row - model.m.ship.location.row).abs + (location.column - model.m.ship.location.column).abs) <= model.m.ship.vision
 
 		end
 	preemptive_action(sf_act : INTEGER)
@@ -51,14 +75,53 @@ feature
 		end
 	action_when_starfighter_is_not_seen
 		do
-
+			move_enemy(2)
+			if not is_destroyed then
+				if location.column >= 1 then
+					model.m.enemy_act_display_str.append ("    A Pylon(id:"+id.out+") moves: ["+model.m.row_indexes.item (location.row).out+","+(location.column + 2).out+"] -> ["+model.m.row_indexes.item (location.row).out+","+location.column.out+"]%N")
+					heal_enemies
+					current_health := current_health + 10
+					if current_health > total_health then
+						current_health := total_health
+					end
+				else
+					model.m.enemy_act_display_str.append ("    A Pylon(id:"+id.out+") moves: ["+model.m.row_indexes.item (location.row).out+","+(location.column + 2).out+"] -> out of board%N")
+					model.m.enemy_table.remove (id)
+				end
+			end
 		end
 	action_when_starfighter_is_seen
 		do
-
+			move_enemy (1)
+			if not is_destroyed then
+				if location.column >= 1 then
+					model.m.enemy_act_display_str.append ("    A Pylon(id:"+id.out+") moves: ["+model.m.row_indexes.item (location.row).out+","+(location.column + 1).out+"] -> ["+model.m.row_indexes.item (location.row).out+","+location.column.out+"]%N")
+					model.m.enemy_projectile_list.put (create {ENEMY_PROJECTILE}.make (model.m.projectile_id, 70, 2,[location.row, (location.column - 1)]), model.m.projectile_id)
+					model.m.enemy_act_display_str.append ("      A enemy projectile(id:"+model.m.projectile_id.out+") spawns at location ["+model.m.row_indexes.item (location.row).out+","+(location.column - 1).out+"].%N")
+					model.m.projectile_id := model.m.projectile_id - 1
+				else
+					model.m.enemy_act_display_str.append ("    A Pylon(id:"+id.out+") moves: ["+model.m.row_indexes.item (location.row).out+","+(location.column + 1).out+"] -> out of board%N")
+					model.m.enemy_table.remove (id)
+				end
+			end
 		end
 	move_enemy(steps:INTEGER)
-		do
+	local
+			i:INTEGER
 
+		do
+			model.m.board.put ("_", current.location.row, current.location.column)
+			from
+				i:=1
+			until
+				i > steps
+			loop
+				if not is_destroyed then
+					current.location.column := current.location.column - 1
+				end
+				i := i+1
+			end
+			-- CHECK IF OUTSIDE BOARD and delete
 		end
+
 end

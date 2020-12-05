@@ -25,6 +25,7 @@ feature
 			create old_location.default_create
 			create symbol.make_empty
 			symbol := "C"
+			name:="Carrier"
 		end
 
 	update_can_see_starfighter

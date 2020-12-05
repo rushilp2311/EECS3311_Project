@@ -54,7 +54,8 @@ feature
 					model.m.projectile_id := model.m.projectile_id - 1
 					is_turn_ended := true
 					else
-						model.m.enemy_act_display_str.append ("    A Fighter(id:"+id.out+") moves: ["+model.m.row_indexes.item (location.row).out+","+(location.column +6).out+"] -> out of board.%N")
+						model.m.enemy_act_display_str.append ("    A Fighter(id:"+id.out+") moves: ["+model.m.row_indexes.item (location.row).out+","+(location.column +6).out+"] -> out of board%N")
+						model.m.enem
 					end
 				end
 			when 2 then

@@ -26,6 +26,7 @@ feature
 			create old_location.default_create
 			create symbol.make_empty
 			symbol := "I"
+			name := "Interceptor"
 		end
 
 	update_can_see_starfighter
