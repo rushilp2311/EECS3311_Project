@@ -52,7 +52,7 @@ feature
 					fp.id := model.m.projectile_id
 					fp.location := [model.m.ship.location.row, model.m.ship.location.column+1]
 					model.m.board.put ("*",fp.location.row, fp.location.column)
-					model.m.sf_act_display_str := model.m.sf_act_display.display_act (2)
+					model.m.sf_act_display_str.prepend (model.m.sf_act_display.display_act (2))
 					model.m.decrement_projectile_id
 					model.m.calculate_fire_cost
 				end

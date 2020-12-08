@@ -14,6 +14,12 @@ deferred class
 	move_update : INTEGER assign set_move_update
 	symbol : STRING assign set_symbol
 	is_destroyed : BOOLEAN assign set_is_destroyed
+	on_board : BOOLEAN assign set_on_board
+
+	set_on_board(ob : BOOLEAN)
+		do
+			on_board := ob
+		end
 
 	set_is_destroyed(sid:BOOLEAN)
 		do

@@ -63,22 +63,53 @@ feature
 		end
 	action_when_starfighter_is_not_seen
 		do
+			--REGENRATION
+			if current_health /= total_health then
+				current_health := current_health + regen
+			end
+			if current_health > total_health then
+				current_health := total_health
+			end
 			move_enemy(2)
 			if not is_destroyed then
-				model.m.enemy_act_display_str.append ("    A Grunt(id:"+id.out+") moves: ["+model.m.row_indexes.item (location.row).out+","+(location.column + 2).out+"] -> ["+model.m.row_indexes.item (location.row).out+","+location.column.out+"]%N")
+				if location.column >=1 then
+
 				model.m.enemy_projectile_list.put (create {ENEMY_PROJECTILE}.make (model.m.projectile_id, 15, 4,[location.row, (location.column - 1)]), model.m.projectile_id)
-				model.m.enemy_act_display_str.append ("      A enemy projectile(id:"+model.m.projectile_id.out+") spawns at location ["+model.m.row_indexes.item (location.row).out+","+(location.column - 1).out+"].%N")
-				model.m.projectile_id := model.m.projectile_id - 1
+					if location.column - 1 >=1 then
+						model.m.enemy_act_display_str.append ("      A enemy projectile(id:"+model.m.projectile_id.out+") spawns at location ["+model.m.row_indexes.item (location.row).out+","+(location.column - 1).out+"].%N")
+					else
+						model.m.enemy_projectile_list.remove (model.m.projectile_id)
+						model.m.enemy_act_display_str.append ("      A enemy projectile(id:"+model.m.projectile_id.out+") spawns at location out of board.%N")
+					end
+					model.m.projectile_id := model.m.projectile_id - 1
+			else
+					model.m.enemy_act_display_str.append ("    A Grunt(id:"+id.out+") moves: ["+model.m.row_indexes.item (location.row).out+","+(location.column + 2).out+"] -> out of board%N")
+					model.m.enemy_table.remove (id)
+				end
 			end
 		end
 	action_when_starfighter_is_seen
 		do
+			--REGENRATION
+			if current_health /= total_health then
+				current_health := current_health + regen
+			end
+			if current_health > total_health then
+				current_health := total_health
+			end
 			move_enemy(4)
 			if not is_destroyed then
 				if location.column >=1 then
-					model.m.enemy_act_display_str.append ("    A Grunt(id:"+id.out+") moves: ["+model.m.row_indexes.item (location.row).out+","+(location.column + 4).out+"] -> ["+model.m.row_indexes.item (location.row).out+","+location.column.out+"]%N")
+
+					model.m.enemy_act_display_str.append (model.m.e_act_collision_str)
 					model.m.enemy_projectile_list.put (create {ENEMY_PROJECTILE}.make (model.m.projectile_id, 15, 4,[location.row, (location.column - 1)]), model.m.projectile_id)
-					model.m.enemy_act_display_str.append ("      A enemy projectile(id:"+model.m.projectile_id.out+") spawns at location ["+model.m.row_indexes.item (location.row).out+","+(location.column - 1).out+"].%N")
+					if location.column - 1 >=1 then
+						model.m.enemy_act_display_str.append ("      A enemy projectile(id:"+model.m.projectile_id.out+") spawns at location ["+model.m.row_indexes.item (location.row).out+","+(location.column - 1).out+"].%N")
+					else
+						model.m.enemy_projectile_list.remove (model.m.projectile_id)
+						model.m.enemy_act_display_str.append ("      A enemy projectile(id:"+model.m.projectile_id.out+") spawns at location out of board.%N")
+					end
+
 					model.m.projectile_id := model.m.projectile_id - 1
 				else
 					model.m.enemy_act_display_str.append ("    A Grunt(id:"+id.out+") moves: ["+model.m.row_indexes.item (location.row).out+","+(location.column + 4).out+"] -> out of board%N")
@@ -89,20 +120,30 @@ feature
 		end
 	move_enemy(steps:INTEGER)
 		local
-			i:INTEGER
+			i,check_id:INTEGER
 
 		do
-			model.m.board.put ("_", current.location.row, current.location.column)
+			model.m.e_act_collision_str.make_empty
+			if location.column >=1  then
+				model.m.board.put ("_", current.location.row, current.location.column)
+			end
+
 			from
 				i:=1
 			until
 				i > steps
 			loop
+				check_id := model.m.collision.check_for_collision ([current.location.row,current.location.column - 1], id, 3)
 				if not is_destroyed then
 					current.location.column := current.location.column - 1
 				end
 				i := i+1
 			end
+			if location.column >=1  then
+				model.m.enemy_act_display_str.append ("    A Grunt(id:"+id.out+") moves: ["+model.m.row_indexes.item (location.row).out+","+(location.column + steps).out+"] -> ["+model.m.row_indexes.item (location.row).out+","+location.column.out+"]%N")
+			end
+
+			model.m.enemy_act_display_str.append (model.m.e_act_collision_str)
 			-- CHECK IF OUTSIDE BOARD and delete
 		end
 

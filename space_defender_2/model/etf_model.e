@@ -66,6 +66,10 @@ feature {NONE} -- Initialization
 			create enemy_spawn_str.make_empty
 			create enemy_projectile_move_str.make_empty
 			create collision.make
+			create fp_act_collision_str.make_empty
+			create ep_act_collision_str.make_empty
+			create sf_act_collision_str.make_empty
+			create e_act_collision_str.make_empty
 			----------------
 			set_state_items
 
@@ -114,6 +118,13 @@ feature -- model attributes
 	enemy_spawn_str : STRING assign set_enemy_spawn
 	enemy_projectile_move_str :STRING
 	collision:COLLISION
+
+	-------------------------------------
+	--COLLISION STRINGS
+	fp_act_collision_str : STRING
+	ep_act_collision_str : STRING
+	sf_act_collision_str : STRING
+	e_act_collision_str : STRING
 
 
 
@@ -371,7 +382,7 @@ feature --utility operations
 				end
 				enemy_id := enemy_id + 1
 			elseif rand2 >= g_threshold and rand2 < f_threshold then
-				enemy_table.extend (create {FIGHTER}.make(150,5,10,10), enemy_id)
+				enemy_table.extend (create {FIGHTER}.make(enemy_id,150,5,10,10), enemy_id)
 				if attached enemy_table.item (enemy_id) as el then
 					enemy_spawn_str.append ("    A Fighter(id:"+enemy_id.out+") spawns at location ["+row_indexes.item (rand1).out+","+column.out+"].")
 					el.location := [rand1,column]
@@ -379,7 +390,7 @@ feature --utility operations
 				end
 				enemy_id := enemy_id + 1
 			elseif rand2 >= f_threshold and rand2 < c_threshold then
-				enemy_table.extend (create {CARRIER}.make(200,10,15,15), enemy_id)
+				enemy_table.extend (create {CARRIER}.make(enemy_id,200,10,15,15), enemy_id)
 				if attached enemy_table.item (enemy_id) as el then
 					enemy_spawn_str.append ("    A Carrier(id:"+enemy_id.out+") spawns at location ["+row_indexes.item (rand1).out+","+column.out+"].")
 					el.location := [rand1,column]
@@ -527,7 +538,9 @@ feature -- model operations
 				else
 					css := "F"
 				end
-				enemy_display_str.append ("    ["+i.out+","+eti.symbol+"]->health:"+eti.current_health.out+"/"+eti.total_health.out+", Regen:"+eti.regen.out+", Armour:"+eti.armour.out+", Vision:"+eti.vision.out+", seen_by_Starfighter:"+ss+", can_see_Starfighter:"+css+", location:["+row_indexes.item(eti.location.row).out+","+eti.location.column.out+"]%N")
+				if not eti.is_destroyed and enemy_table.has (i) then
+					enemy_display_str.append ("    ["+i.out+","+eti.symbol+"]->health:"+eti.current_health.out+"/"+eti.total_health.out+", Regen:"+eti.regen.out+", Armour:"+eti.armour.out+", Vision:"+eti.vision.out+", seen_by_Starfighter:"+ss+", can_see_Starfighter:"+css+", location:["+row_indexes.item(eti.location.row).out+","+eti.location.column.out+"]%N")
+				end
 			end
 
 			i := i+1
@@ -598,6 +611,7 @@ feature -- model operations
 				s.append ("  Enemy Action:%N")
 				if not enemy_act_display_str.is_empty then
 					s.append (enemy_act_display_str)
+
 				end
 				s.append ("  Natural Enemy Spawn:")
 				if not enemy_spawn_str.is_empty then
@@ -717,6 +731,8 @@ feature -- model operations
 		do
 			error_state_counter := 0 --Reseting error state cursor
 			increment_success_state_counter
+			create e_act_collision_str.make_empty
+			create enemy_act_display_str.make_empty
 			--FRIEDNLY PROJECTILE ACT
 			if friendly_projectile_list.count > 0 then
 				update.update_friendly_projectile
@@ -759,6 +775,8 @@ feature -- model operations
 			ship.old_location := ship.location
 			error_state_counter := 0 --Reseting error state cursor
 			create collision_string.make_empty
+			create enemy_act_display_str.make_empty
+			create e_act_collision_str.make_empty
 			--FRIENDLY PROJECTILE ACT
 			if friendly_projectile_list.count > 0 then
 				update.update_friendly_projectile
@@ -890,6 +908,7 @@ feature -- model operations
 		do
 			--CHECK COLLIDING VALIDATIONS
 			error_state_counter := 0 --Reseting error state cursor
+			create e_act_collision_str.make_empty
 			--FRIENDLY PROJECTILE ACT
 			if friendly_projectile_list.count > 0 then
 				update.update_friendly_projectile
@@ -933,7 +952,7 @@ feature -- model operations
 		do
 			--APPLY REGENRATION CHECK COLLIDING VALIDATIONS
 			error_state_counter := 0 --Reseting error state cursor
-			--FRIENDLY PROJECTILE ACT
+			create e_act_collision_str.make_empty
 			if friendly_projectile_list.count > 0 then
 				update.update_friendly_projectile
 			end
@@ -1034,6 +1053,10 @@ feature -- model operations
 			create enemy_table.make (100)
 			create enemy_act_display_str.make_empty
 			create enemy_display_str.make_empty
+			create e_act_collision_str.make_empty
+			create fp_act_collision_str.make_empty
+			create sf_act_collision_str.make_empty
+			create e_act_collision_str.make_empty
 			success_state_counter := 0
 			error_state_counter := 0
 			ship.empty_attributes
@@ -1079,8 +1102,10 @@ feature -- queries
 			create enemy_projectile_move_str.make_empty
 			create enemy_display_str.make_empty
 			create enemy_act_display_str.make_empty
+			create fp_act_collision_str.make_empty
 			create sf_act_display_str.make_empty
 			create enemy_spawn_str.make_empty
+			create e_act_collision_str.make_empty
 		end
 
 end
