@@ -29,6 +29,15 @@ feature
 			name := "Interceptor"
 		end
 
+	add_score
+		local
+			bronze : ORB
+		do
+			create {BRONZE} bronze.make
+			model.m.score.add (bronze)
+		end
+
+
 	update_can_see_starfighter
 		do
 			can_see_starfighter := ((location.row - model.m.ship.location.row).abs + (location.column - model.m.ship.location.column).abs) <= vision
@@ -50,7 +59,7 @@ feature
 						is_turn_ended := true
 					when 3 then
 						--SPECIAL
-						
+
 					else
 
 					end
@@ -60,7 +69,9 @@ feature
 			move_enemy(3)
 			if not is_destroyed then
 				if location.row >= 1 and location.row <= model.m.board.height and (location.column >=1) and (location.column <= model.m.board.width) then
+
 				else
+
 					model.m.enemy_table.remove (id)
 				end
 			end
@@ -70,7 +81,9 @@ feature
 			move_enemy(3)
 			if not is_destroyed then
 				if location.row >= 1 and location.row <= model.m.board.height and (location.column >=1) and (location.column <= model.m.board.width) then
+
 				else
+
 					model.m.enemy_table.remove (id)
 				end
 			end
@@ -82,9 +95,11 @@ feature
 
 		do
 		model.m.e_act_collision_str.make_empty
-		old_location.row := location.row
-		old_location.column := location.column
 		if location.row >= 1 and location.row <= model.m.board.height and (location.column >=1) and (location.column <= model.m.board.width)  then
+			old_location.row := location.row
+			old_location.column := location.column
+		end
+		if location.row >= 1 and location.row <= model.m.board.height and (location.column >=1) and (location.column <= model.m.board.width) and not is_destroyed then
 			model.m.board.put ("_", location.row, location.column)
 		end
 
@@ -103,8 +118,17 @@ feature
 
 				i := i+1
 			end
-			if location.column >=1  then
-				model.m.enemy_act_display_str.append ("    A "+name+"(id:"+id.out+") moves: ["+model.m.row_indexes.item (location.row).out+","+(old_location.column).out+"] -> ["+model.m.row_indexes.item (location.row).out+","+location.column.out+"]%N")
+			if location.column >= 1  then
+					if old_location.row = location.row and old_location.column = location.column then
+							model.m.enemy_act_display_str.append ("    A "+name+"(id:"+id.out+") stays at: ["+model.m.row_indexes.item (old_location.row).out+","+(old_location.column).out+"]%N")
+					else
+						model.m.enemy_act_display_str.append ("    A "+name+"(id:"+id.out+") moves: ["+model.m.row_indexes.item (old_location.row).out+","+(old_location.column).out+"] -> ["+model.m.row_indexes.item (location.row).out+","+location.column.out+"]%N")
+					end
+			else
+				if attached model.m.enemy_table.item (id) as cp then
+						model.m.enemy_act_display_str.append ("    "+cp.name+ "%N")
+				end
+
 			end
 			model.m.enemy_act_display_str.append (model.m.e_act_collision_str)
 		end
@@ -114,10 +138,12 @@ feature
 			i,check_id:INTEGER
 		do
 		model.m.e_act_collision_str.make_empty
+			if location.row >= 1 and location.row <= model.m.board.height and (location.column >=1) and (location.column <= model.m.board.width)  then
 			old_location.row := location.row
 			old_location.column := location.column
+		end
 			if steps > 0 then
-				if location.row >= 1 and location.row <= model.m.board.height and not is_destroyed then
+				if location.row >= 1 and location.row <= model.m.board.height and (location.column >=1) and (location.column <= model.m.board.width) and not is_destroyed then
 					model.m.board.put ("_", location.row, location.column)
 				end
 				-- MOVE DOWN
@@ -135,8 +161,14 @@ feature
 					end
 					i := i + 1
 				end
-				if location.row >= 1 and location.row <= model.m.board.height then
-					model.m.enemy_act_display_str.append ("    A Interceptor(id:"+id.out+") moves: ["+model.m.row_indexes.item (old_location.row).out+","+(old_location.column).out+"] -> ["+model.m.row_indexes.item (location.row).out+","+location.column.out+"]%N")
+				if location.row >= 1 and location.row <= model.m.board.height and (location.column >=1) and (location.column <= model.m.board.width) then
+					if old_location.row = location.row and old_location.column = location.column then
+							model.m.enemy_act_display_str.append ("    A Interceptor(id:"+id.out+") stays at: ["+model.m.row_indexes.item (old_location.row).out+","+(old_location.column).out+"]%N")
+					else
+						model.m.enemy_act_display_str.append ("    A Interceptor(id:"+id.out+") moves: ["+model.m.row_indexes.item (old_location.row).out+","+(old_location.column).out+"] -> ["+model.m.row_indexes.item (location.row).out+","+location.column.out+"]%N")
+					end
+				else
+				--	model.m.enemy_act_display_str.append ("    A Interceptor(id:"+id.out+") moves: ["+model.m.row_indexes.item (old_location.row).out+","+(old_location.column).out+"] -> out of board%N")
 				end
 				model.m.enemy_act_display_str.append (model.m.e_act_collision_str)
 
@@ -161,12 +193,22 @@ feature
 					end
 					i := i + 1
 				end
-				if location.row >= 1 and location.row <= model.m.board.height then
-					model.m.enemy_act_display_str.append ("    A Interceptor(id:"+id.out+") moves: ["+model.m.row_indexes.item (old_location.row).out+","+(old_location.column).out+"] -> ["+model.m.row_indexes.item (location.row).out+","+location.column.out+"]%N")
+				if location.row >= 1 and location.row <= model.m.board.height and (location.column >=1) and (location.column <= model.m.board.width) then
+					if old_location.row = location.row and old_location.column = location.column then
+							model.m.enemy_act_display_str.append ("    A Interceptor(id:"+id.out+") stays at: ["+model.m.row_indexes.item (old_location.row).out+","+(old_location.column).out+"]%N")
+					else
+						model.m.enemy_act_display_str.append ("    A Interceptor(id:"+id.out+") moves: ["+model.m.row_indexes.item (old_location.row).out+","+(old_location.column).out+"] -> ["+model.m.row_indexes.item (location.row).out+","+location.column.out+"]%N")
+					end
+				else
+				--	model.m.enemy_act_display_str.append ("    A Interceptor(id:"+id.out+") moves: ["+model.m.row_indexes.item (old_location.row).out+","+(old_location.column).out+"] -> out of board%N")
+
 				end
 				model.m.enemy_act_display_str.append (model.m.e_act_collision_str)
 			else
 				--STAYS
+				if location.row >= 1 and location.row <= model.m.board.height and (location.column >=1) and (location.column <= model.m.board.width) then
+					model.m.enemy_act_display_str.append ("    A Interceptor(id:"+id.out+") stays at: ["+model.m.row_indexes.item (old_location.row).out+","+(old_location.column).out+"]%N")
+				end
 			end
 		end
 

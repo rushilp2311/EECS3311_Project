@@ -103,6 +103,7 @@ feature
 									if current_enemy.current_health <= 0 then
 										--ENEMY DESTORYED
 										current_enemy.is_destroyed := true
+										current_enemy.add_score
 										Result := 0
 									end
 								end
@@ -215,8 +216,10 @@ feature
 					if attached model.m.enemy_table.item (id) as current_enemy then
 						model.m.ship.current_health := model.m.ship.current_health - current_enemy.current_health
 						if model.m.ship.current_health <= 0 then
+							model.m.ship.current_health := 0
 							model.m.ship.is_destroyed := true
 							Result := 0
+							current_enemy.add_score
 							model.m.enemy_table.remove (id)
 						end
 					end
@@ -251,7 +254,9 @@ feature
 										el.is_destroyed := true
 										model.m.fp_act_collision_str.append ("      The "+el.name+" at location ["+model.m.row_indexes.item (location.row).out+","+location.column.out+"] has been destroyed.%N")
 										model.m.board.put ("_", el.location.row, el.location.column)
+										el.add_score
 										model.m.enemy_table.remove (el.id)
+
 										Result := 0
 									end
 								end
@@ -284,6 +289,7 @@ feature
 									model.m.sf_act_display_str.append ("      The Starfighter at location ["+model.m.row_indexes.item (location.row).out+","+location.column.out+"] has been destroyed.%N")
 								end
 								Result := 0
+								el.add_score
 								model.m.enemy_table.remove (index)
 							when 3 then
 								Result := 1

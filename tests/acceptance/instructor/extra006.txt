@@ -1,0 +1,8 @@
+play(5,10,1,1,101,101,101)
+setup_next(5)
+fire
+pass
+pass
+pass
+pass
+pass

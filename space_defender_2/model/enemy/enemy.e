@@ -24,7 +24,14 @@ feature --Attributes
 	is_destroyed : BOOLEAN assign set_is_destroyed
 	name : STRING assign set_name
 
+
 feature
+
+
+	add_score
+		deferred
+		end
+
 
 	set_name(sn : STRING)
 		do

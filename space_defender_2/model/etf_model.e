@@ -47,7 +47,7 @@ feature {NONE} -- Initialization
 			create friendly_projectile_list.make (100)
 			create enemy_projectile_list.make (100)
 			create grid_layout.make_empty
-			row_indexes := <<'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'>>
+			row_indexes := <<"A", "B", "C", "D", "E", "F", "G", "H", "I", "J">>
 			create board.make_filled (create {STRING}.make_empty,0,0)
 			rand1 := 0
 			rand2 := 0
@@ -70,6 +70,7 @@ feature {NONE} -- Initialization
 			create ep_act_collision_str.make_empty
 			create sf_act_collision_str.make_empty
 			create e_act_collision_str.make_empty
+			create score.make
 			----------------
 			set_state_items
 
@@ -88,7 +89,7 @@ feature -- model attributes
 	in_game:BOOLEAN
 	cursor:INTEGER assign set_cursor
 	debug_mode:BOOLEAN
-	row_indexes : ARRAY[CHARACTER]
+	row_indexes : ARRAY[STRING]
 	state_name:STRING
 	error:ERROR
 	is_error : BOOLEAN
@@ -118,6 +119,7 @@ feature -- model attributes
 	enemy_spawn_str : STRING assign set_enemy_spawn
 	enemy_projectile_move_str :STRING
 	collision:COLLISION
+	score:SCORE
 
 	-------------------------------------
 	--COLLISION STRINGS
@@ -369,6 +371,8 @@ feature --utility operations
 	--Adding enemy to enemy table
 	--TODO : CHECK FOR OCCUPIED POSITIONS
 	add_enemy
+	local
+		check_id:INTEGER
 		do
 			generate_random_number
 			if rand2 >= 1 and rand2 < g_threshold then
@@ -376,8 +380,13 @@ feature --utility operations
 				if attached enemy_table.item (enemy_id) as el then
 					enemy_spawn_str.append ("    A Grunt(id:"+enemy_id.out+") spawns at location ["+row_indexes.item (rand1).out+","+column.out+"].")
 
-					el.location := [rand1,column]
-					board.put ("G",rand1, column)
+					check_id := collision.check_for_collision ([rand1,column], enemy_id, 3)
+					if check_id/=1 and not el.is_destroyed then
+						el.location := [rand1,column]
+						board.put ("G",rand1, column)
+					else
+						enemy_table.remove (enemy_id)
+					end
 					enemy_vision_update
 				end
 				enemy_id := enemy_id + 1
@@ -385,32 +394,56 @@ feature --utility operations
 				enemy_table.extend (create {FIGHTER}.make(enemy_id,150,5,10,10), enemy_id)
 				if attached enemy_table.item (enemy_id) as el then
 					enemy_spawn_str.append ("    A Fighter(id:"+enemy_id.out+") spawns at location ["+row_indexes.item (rand1).out+","+column.out+"].")
-					el.location := [rand1,column]
-					board.put ("F",rand1, column)
+					check_id := collision.check_for_collision ([rand1,column], enemy_id, 3)
+					if check_id/=1 and not el.is_destroyed then
+						el.location := [rand1,column]
+						board.put ("F",rand1, column)
+					else
+						enemy_table.remove (enemy_id)
+					end
+					enemy_vision_update
 				end
 				enemy_id := enemy_id + 1
 			elseif rand2 >= f_threshold and rand2 < c_threshold then
 				enemy_table.extend (create {CARRIER}.make(enemy_id,200,10,15,15), enemy_id)
 				if attached enemy_table.item (enemy_id) as el then
 					enemy_spawn_str.append ("    A Carrier(id:"+enemy_id.out+") spawns at location ["+row_indexes.item (rand1).out+","+column.out+"].")
-					el.location := [rand1,column]
-					board.put ("C",rand1, column)
+					check_id := collision.check_for_collision ([rand1,column], enemy_id, 3)
+					if check_id/=1 and not el.is_destroyed then
+						el.location := [rand1,column]
+						board.put ("C",rand1, column)
+					else
+						enemy_table.remove (enemy_id)
+					end
+					enemy_vision_update
 				end
 				enemy_id := enemy_id + 1
 			elseif rand2 >= c_threshold and rand2 < i_threshold then
 				enemy_table.extend (create {INTERCEPTOR}.make(enemy_id,50,0,0,5), enemy_id)
 				if attached enemy_table.item (enemy_id) as el then
 					enemy_spawn_str.append ("    A Interceptor(id:"+el.id.out+") spawns at location ["+row_indexes.item (rand1).out+","+column.out+"].")
-					el.location := [rand1,column]
-					board.put ("I",rand1, column)
+					check_id := collision.check_for_collision ([rand1,column], enemy_id, 3)
+					if check_id/=1 and not el.is_destroyed then
+						el.location := [rand1,column]
+						board.put ("I",rand1, column)
+					else
+						enemy_table.remove (enemy_id)
+					end
+					enemy_vision_update
 				end
 				enemy_id := enemy_id + 1
 			elseif rand2 >= i_threshold and rand2 < p_threshold then
-				enemy_table.extend (create {PYLON}.make(300,0,0,5), enemy_id)
+				enemy_table.extend (create {PYLON}.make(enemy_id,300,0,0,5), enemy_id)
 				if attached enemy_table.item (enemy_id) as el then
 					enemy_spawn_str.append ("    A Pylon(id:"+enemy_id.out+") spawns at location ["+row_indexes.item (rand1).out+","+column.out+"].")
-					el.location := [rand1,column]
-					board.put ("P",rand1, column)
+					check_id := collision.check_for_collision ([rand1,column], enemy_id, 3)
+					if check_id/=1 and not el.is_destroyed then
+						el.location := [rand1,column]
+						board.put ("P",rand1, column)
+					else
+						enemy_table.remove (enemy_id)
+					end
+					enemy_vision_update
 				end
 				enemy_id := enemy_id + 1
 
@@ -594,7 +627,7 @@ feature -- model operations
 				s.append (", Projectile Cost:"+ship.projectile_cost.out+" (energy)%N")
 			end
 			s.append ("      Power:"+ship.choice_selected[4].name+"%N")
-			s.append ("      score:0")
+			s.append ("      score:"+score.get_score.out)
 			if in_toggle_mode then
 				s.append ("%N  Enemy:%N")
 					s.append (enemy_display_str)
@@ -654,6 +687,7 @@ feature -- model operations
 				if attached enemy_table.item (et.item) as el then
 					if  el.location.column >= 1  then
 						board.put (el.symbol,el.location.row,el.location.column)
+						el.is_turn_ended := false
 					end
 				end
 			end
@@ -763,6 +797,12 @@ feature -- model operations
 			end
 			--ENEMY SPWAN
 			add_enemy
+			if ship.is_destroyed then
+				-- Put X on the location of starfigther
+
+				board.put ("X", ship.location.row, ship.location.column)
+				cursor := 0
+			end
 			sf_act_display_str := sf_act_display.display_act (3)
 			display
 		end
@@ -894,7 +934,7 @@ feature -- model operations
 				if (ship.is_destroyed = false)  then
 					--ENEMY SPWAN
 					add_enemy
-				else
+
 					cursor := 0
 				end
 				sf_act_display_str.prepend (sf_act_display.display_act (1))
@@ -939,6 +979,12 @@ feature -- model operations
 			enemy_vision_update
 			--ENEMY SPWAN
 			add_enemy
+			if ship.is_destroyed then
+						-- Put X on the location of starfigther
+						board.put ("_", ship.old_location.row, ship.old_location.column)
+						board.put ("X", ship.location.row, ship.location.column)
+
+			end
 			if is_error = false then
 				increment_success_state_counter
 				display
@@ -1040,6 +1086,11 @@ feature -- model operations
 			end
 			--ENEMY SPWAN
 			add_enemy
+			if ship.is_destroyed then
+						-- Put X on the location of starfigther
+						board.put ("_", ship.old_location.row, ship.old_location.column)
+						board.put ("X", ship.location.row, ship.location.column)
+					end
 			if is_error = false then
 				increment_success_state_counter
 				display
@@ -1083,7 +1134,7 @@ feature -- queries
 		do
 			create Result.make_empty
 			--TODO check for toggle mode in the very begining
-			if cursor = 0 and not (is_error or in_toggle_mode) then
+			if cursor = 0 and not (is_error or in_toggle_mode) and not ship.is_destroyed then
 				set_state_type
 				set_indicate
 				set_state

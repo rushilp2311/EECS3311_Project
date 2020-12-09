@@ -12,11 +12,12 @@ inherit
 create
 	make
 feature
-	make(h:INTEGER;r:INTEGER;a:INTEGER;v:INTEGER)
+	make(i_d:INTEGER;h:INTEGER;r:INTEGER;a:INTEGER;v:INTEGER)
 		do
 			create location.default_create
 			current_health := h
 			total_health := h
+			id:= i_d
 			regen := r
 			armour := a
 			vision := v
@@ -28,6 +29,15 @@ feature
 			symbol := "P"
 			name := "Pylon"
 		end
+
+	add_score
+		local
+			platinum : FOCUS
+		do
+			create {PLATINUM} platinum.make
+			model.m.score.add (platinum)
+		end
+
 
 	heal_enemies
 	local
@@ -44,6 +54,7 @@ feature
 						if e.current_health > e.total_health then
 							e.current_health := e.total_health
 						end
+						model.m.enemy_act_display_str.append("      The Pylon heals "+e.name+"(id:"+e.id.out+") at location ["+model.m.row_indexes.item (e.location.row).out+","+(e.location.column).out+"] for 10 damage.%N")
 					end
 				end
 

@@ -154,7 +154,7 @@
     [0,S]->health:0/70, energy:49/70, Regen:1/3, Armour:1, Vision:13, Move:10, Move Cost:3, location:[A,6]
       Projectile Pattern:Standard, Projectile Damage:70, Projectile Cost:5 (energy)
       Power:Recall (50 energy): Teleport back to spawn.
-      score:0
+      score:2
   Enemy:
   Projectile:
   Friendly Projectile Action:

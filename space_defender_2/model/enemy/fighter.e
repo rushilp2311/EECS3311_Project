@@ -29,6 +29,14 @@ feature
 			name := "Fighter"
 		end
 
+	add_score
+		local
+			gold : ORB
+		do
+			create {GOLD} gold.make
+			model.m.score.add (gold)
+		end
+
 	update_can_see_starfighter
 		do
 			can_see_starfighter := ((location.row - model.m.ship.location.row).abs + (location.column - model.m.ship.location.column).abs) <= vision
@@ -50,10 +58,10 @@ feature
 					if location.column >=1 then
 						model.m.enemy_projectile_list.put (create {ENEMY_PROJECTILE}.make (model.m.projectile_id, 100, 10,[location.row, (location.column - 1)]), model.m.projectile_id)
 						if location.column - 1 >=1 then
-						model.m.enemy_act_display_str.append ("      A enemy projectile(id:"+model.m.projectile_id.out+") spawns at location ["+model.m.row_indexes.item (location.row).out+","+(location.column - 1).out+"].%N")
+							model.m.enemy_act_display_str.append ("      A enemy projectile(id:"+model.m.projectile_id.out+") spawns at location ["+model.m.row_indexes.item (location.row).out+","+(location.column - 1).out+"].%N")
 						else
 							model.m.enemy_projectile_list.remove (model.m.projectile_id)
-							model.m.enemy_act_display_str.append ("      A enemy projectile(id:"+model.m.projectile_id.out+") spawns at location out of board.%N")
+							model.m.enemy_act_display_str.append ("      A enemy projectile(id:"+model.m.projectile_id.out+") spawns at location out of board%N")
 						end
 
 						if attached model.m.enemy_projectile_list.item (model.m.projectile_id) as ep then
@@ -67,7 +75,7 @@ feature
 						model.m.projectile_id := model.m.projectile_id - 1
 						is_turn_ended := true
 					else
-						model.m.enemy_act_display_str.append ("    A "+name+"(id:"+id.out+") moves: ["+model.m.row_indexes.item (location.row).out+","+(location.column +6).out+"] -> out of board.%N")
+						model.m.enemy_table.remove (id)
 					end
 
 						model.m.enemy_act_display_str.append (model.m.e_act_collision_str)
@@ -111,7 +119,7 @@ feature
 							end
 						end
 				else
-					model.m.enemy_act_display_str.append ("    A "+name+"(id:"+id.out+") moves: ["+model.m.row_indexes.item (location.row).out+","+(location.column + 4).out+"] -> out of board%N")
+
 					model.m.enemy_table.remove (id)
 				end
 			end
@@ -144,7 +152,7 @@ feature
 							end
 						end
 				else
-					model.m.enemy_act_display_str.append ("    A "+name+"(id:"+id.out+") moves: ["+model.m.row_indexes.item (location.row).out+","+(old_location.column).out+"] -> out of board.%N")
+
 					model.m.enemy_table.remove (id)
 				end
 			end
@@ -178,7 +186,13 @@ feature
 				i := i+1
 			end
 			if location.column >=1  then
-				model.m.enemy_act_display_str.append ("    A "+name+"(id:"+id.out+") moves: ["+model.m.row_indexes.item (location.row).out+","+(old_location.column).out+"] -> ["+model.m.row_indexes.item (location.row).out+","+location.column.out+"]%N")
+				if old_location.row = location.row and old_location.column = location.column then
+							model.m.enemy_act_display_str.append ("    A "+name+"(id:"+id.out+") stays at: ["+model.m.row_indexes.item (old_location.row).out+","+(old_location.column).out+"]%N")
+					else
+						model.m.enemy_act_display_str.append ("    A "+name+"(id:"+id.out+") moves: ["+model.m.row_indexes.item (old_location.row).out+","+(old_location.column).out+"] -> ["+model.m.row_indexes.item (location.row).out+","+location.column.out+"]%N")
+					end
+			else
+				model.m.enemy_act_display_str.append ("    A "+name+"(id:"+id.out+") moves: ["+model.m.row_indexes.item (location.row).out+","+(old_location.column).out+"] -> out of board%N")
 			end
 			model.m.enemy_act_display_str.append (model.m.e_act_collision_str)
 			-- CHECK IF OUTSIDE BOARD and delete
