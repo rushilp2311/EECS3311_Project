@@ -72,13 +72,13 @@ feature
 								if el.damage > current_enemy_projectile.damage then
 									el.damage := el.damage - current_enemy_projectile.damage
 									--display
-									model.m.enemy_projectile_list.remove (id)
+									current_enemy_projectile.is_destroyed := true
 								elseif el.damage < current_enemy_projectile.damage then
 									current_enemy_projectile.damage := current_enemy_projectile.damage - el.damage
-									model.m.friendly_projectile_list.remove (index)
+									model.m.friendly_projectile_list.remove (el.id)
 								else
-									model.m.friendly_projectile_list.remove (index)
-									model.m.enemy_projectile_list.remove (id)
+									current_enemy_projectile.is_destroyed := true
+									model.m.friendly_projectile_list.remove (el.id)
 								end
 								Result := 0
 							end
@@ -140,11 +140,11 @@ feature
 									model.m.enemy_projectile_list.remove (el.id)
 								elseif el.damage > current_friendly_projectile.damage then
 									el.damage := el.damage - current_friendly_projectile.damage
-									model.m.friendly_projectile_list.remove (id)
+									current_friendly_projectile.is_destroyed := true
 								else
 									model.m.board.put ("_", el.location.row, el.location.column)
-									model.m.friendly_projectile_list.remove (id)
-									model.m.enemy_projectile_list.remove (el.id)
+									model.m.enemy_projectile_list.remove(el.id)
+									current_friendly_projectile.is_destroyed := true
 								end
 								model.m.fp_act_collision_str.append ("      The projectile collides with enemy projectile(id:"+index.out+") at location ["+model.m.row_indexes.item (location.row).out+","+location.column.out+"], negating damage.%N")
 								index :=  model.m.projectile_id - 1
@@ -153,7 +153,7 @@ feature
 						when 1 then
 							if attached  model.m.enemy_projectile_list.item (id) as current_enemy_projectile then
 								current_enemy_projectile.damage := current_enemy_projectile.damage + el.damage
-								model.m.enemy_projectile_list.remove (index)
+								el.is_destroyed := true
 							end
 						when 2 then
 							if (el.damage - model.m.ship.armour) > 0 then
@@ -203,10 +203,11 @@ feature
 					if attached model.m.enemy_projectile_list.item (id) as current_enemy_projectile then
 						if (current_enemy_projectile.damage - model.m.ship.armour) > 0 then
 							model.m.ship.current_health := model.m.ship.current_health - (current_enemy_projectile.damage - model.m.ship.armour)
-
+							current_enemy_projectile.is_destroyed := true
 								if model.m.ship.current_health <= 0 then
 								--STARFIGTHER DESTROYED
 									model.m.ship.is_destroyed := true
+
 									Result := 0
 								end
 						end
@@ -220,8 +221,10 @@ feature
 							model.m.ship.is_destroyed := true
 							Result := 0
 							current_enemy.add_score
-							model.m.enemy_table.remove (id)
+
 						end
+						model.m.sf_act_display_str.append ("      The "+current_enemy.name+" at location ["+model.m.row_indexes.item (location.row).out+","+location.column.out+"] has been destroyed.%N")
+						model.m.enemy_table.remove (id)
 					end
 				else
 

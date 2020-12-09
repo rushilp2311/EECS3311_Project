@@ -934,7 +934,7 @@ feature -- model operations
 				if (ship.is_destroyed = false)  then
 					--ENEMY SPWAN
 					add_enemy
-
+				else
 					cursor := 0
 				end
 				sf_act_display_str.prepend (sf_act_display.display_act (1))
@@ -1036,6 +1036,16 @@ feature -- model operations
 				end
 				create sf_act_display_str.make_empty
 				sf_act_display_str.append ("The Starfighter(id:0) uses special, gaining 50 health.%N")
+			when 3 then
+				if ship.current_health > 50 then
+					ship.current_energy := (ship.current_health - 50) * 2
+					ship.current_health := ship.current_health - 50
+					sf_act_display_str.append ("The Starfighter(id:0) uses special, gaining "+((ship.current_health - 50) * 2).out+" energy at the expense of "+(ship.current_health - 50).out+" health.%N")
+				else
+					ship.current_energy := (ship.current_health - 1) * 2
+					ship.current_health := 1
+					sf_act_display_str.append ("The Starfighter(id:0) uses special, gaining "+((ship.current_health - 1) * 2).out+" energy at the expense of "+(ship.current_health - 1).out+" health.%N")
+				end
 			when 4 then
 				from index := -1
 				until
@@ -1063,6 +1073,22 @@ feature -- model operations
 				sf_act_display_str := sf_act_display.display_act (4)
 				create friendly_projectile_list.make (100)
 				create enemy_projectile_list.make (100)
+			when 5 then
+				sf_act_display_str.append ("The Starfighter(id:0) uses special, clearing projectiles with drones.")
+				from i:= 1
+				until
+					i > enemy_id
+				loop
+					if attached enemy_table.item (i) as ep then
+						ep.current_health := ep.current_health - (100 - ep.armour)
+						if ep.current_health <= 0 then
+							sf_act_display_str.append ("The "+ep.name+" at location ["+row_indexes.item (ep.location.row).out+","+ep.location.column.out+"] has been destroyed.%N")
+							enemy_table.remove (i)
+						else
+							sf_act_display_str.append ("The "+ep.name+"(id:"+ep.id.out+") at location ["+row_indexes.item (ep.location.row).out+","+ep.location.column.out+"] takes 100 damage.%N")
+						end
+					end
+				end
 			else
 
 			end

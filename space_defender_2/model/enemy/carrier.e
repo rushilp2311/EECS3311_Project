@@ -54,58 +54,58 @@ feature
 				when 1 then
 					-- PASS
 					move_enemy(2)
---					if not is_destroyed then
---						if location.column >= 1 then
---							model.m.enemy_table.extend (create {INTERCEPTOR}.make(model.m.enemy_id,50,0,0,5), model.m.enemy_id)
+					if not is_destroyed then
+						if location.column >= 1 then
+							model.m.enemy_table.extend (create {INTERCEPTOR}.make(model.m.enemy_id,50,0,0,5), model.m.enemy_id)
 
---							check_id := model.m.collision.check_for_collision ([location.row-1,location.column], model.m.enemy_id, 3)
---							if attached model.m.enemy_table.item (model.m.enemy_id) as current_enemy then
---								if (check_id /=1) and not current_enemy.is_destroyed  then
---									if (location.row - 1 >= 1) and (location.row - 1<= model.m.board.height) and (location.column >=1) and (location.column <= model.m.board.width)then
---										current_enemy.location.row := location.row-1
---										current_enemy.location.column := location.column
---										current_enemy.is_turn_ended := true
+							check_id := model.m.collision.check_for_collision ([location.row-1,location.column], model.m.enemy_id, 3)
+							if attached model.m.enemy_table.item (model.m.enemy_id) as current_enemy then
+								if (check_id /=1) and not current_enemy.is_destroyed  then
+									if (location.row - 1 >= 1) and (location.row - 1<= model.m.board.height) and (location.column >=1) and (location.column <= model.m.board.width)then
+										current_enemy.location.row := location.row-1
+										current_enemy.location.column := location.column
+										current_enemy.is_turn_ended := true
 
---										model.m.enemy_act_display_str.append ("      A Interceptor(id:"+model.m.enemy_id.out+") spawns at location ["+model.m.row_indexes.item (current_enemy.location.row).out+","+(current_enemy.location.column).out+"].%N")
---									else
---										model.m.enemy_act_display_str.append ("      A Interceptor(id:"+model.m.enemy_id.out+") spawns at location out of board.%N")
+										model.m.enemy_act_display_str.append ("      A Interceptor(id:"+model.m.enemy_id.out+") spawns at location ["+model.m.row_indexes.item (current_enemy.location.row).out+","+(current_enemy.location.column).out+"].%N")
+									else
+										model.m.enemy_act_display_str.append ("      A Interceptor(id:"+model.m.enemy_id.out+") spawns at location out of board.%N")
 
---									end
---								end
---							end
+									end
+								end
+							end
 
---							if check_id /= 1 then
---								model.m.enemy_id := model.m.enemy_id + 1
+							if check_id /= 1 then
+								model.m.enemy_id := model.m.enemy_id + 1
 
---							end
+							end
 
 
---							model.m.enemy_table.extend (create {INTERCEPTOR}.make(model.m.enemy_id,50,0,0,5), model.m.enemy_id)
+							model.m.enemy_table.extend (create {INTERCEPTOR}.make(model.m.enemy_id,50,0,0,5), model.m.enemy_id)
 
---							check_id := model.m.collision.check_for_collision ([location.row+1,location.column], model.m.enemy_id, 3)
---							if attached model.m.enemy_table.item (model.m.enemy_id) as current_enemy then
---										current_enemy.location.row := location.row+1
---										current_enemy.location.column := location.column
---								if (check_id /=1) and not current_enemy.is_destroyed  then
---									if (current_enemy.location.row >= 1) and (current_enemy.location.row<= model.m.board.height) and (current_enemy.location.column >=1) and (current_enemy.location.column <= model.m.board.width)then
+							check_id := model.m.collision.check_for_collision ([location.row+1,location.column], model.m.enemy_id, 3)
+							if attached model.m.enemy_table.item (model.m.enemy_id) as current_enemy then
+										current_enemy.location.row := location.row+1
+										current_enemy.location.column := location.column
+								if (check_id /=1) and not current_enemy.is_destroyed  then
+									if (current_enemy.location.row >= 1) and (current_enemy.location.row<= model.m.board.height) and (current_enemy.location.column >=1) and (current_enemy.location.column <= model.m.board.width)then
 
---										current_enemy.is_turn_ended := true
---										model.m.enemy_act_display_str.append ("      A Interceptor(id:"+model.m.enemy_id.out+") spawns at location ["+model.m.row_indexes.item (current_enemy.location.row).out+","+(current_enemy.location.column).out+"].%N")
---									else
---										model.m.enemy_act_display_str.append ("      A Interceptor(id:"+model.m.enemy_id.out+") spawns at location out of board.%N")
+										current_enemy.is_turn_ended := true
+										model.m.enemy_act_display_str.append ("      A Interceptor(id:"+model.m.enemy_id.out+") spawns at location ["+model.m.row_indexes.item (current_enemy.location.row).out+","+(current_enemy.location.column).out+"].%N")
+									else
+										model.m.enemy_act_display_str.append ("      A Interceptor(id:"+model.m.enemy_id.out+") spawns at location out of board.%N")
 
---									end
---								end
---							end
+									end
+								end
+							end
 
---							if check_id /= 1 then
---								model.m.enemy_id := model.m.enemy_id + 1
---							end
+							if check_id /= 1 then
+								model.m.enemy_id := model.m.enemy_id + 1
+							end
 
---						end
---						else
---							model.m.enemy_table.remove (id)
---					end
+						end
+						else
+							model.m.enemy_table.remove (id)
+					end
 
 
 					is_turn_ended := true
