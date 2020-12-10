@@ -16,7 +16,7 @@ feature -- attributes
 feature -- deferred queries
 	is_full: BOOLEAN deferred end
 
-	add(o: ORBMENT) deferred end
+	add(orb: ORBMENT) deferred end
 
 
 

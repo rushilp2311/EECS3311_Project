@@ -13,22 +13,21 @@ inherit
 create
 	make
 
-feature  -- Initialization
+feature
 
 	make
-			-- Initialization for `Current'.
+
 		do
 			create array.make_empty
 			max_size := 3
 			array.force (create {BRONZE}.make, 1)
---			array.force (void, 1)
---			array.force (void, 1)
+
 		end
 
-feature	-- attributes
+feature
 	max_size: INTEGER
 
-feature -- queries
+feature
 
 
 	is_full: BOOLEAN
@@ -38,8 +37,8 @@ feature -- queries
 		elseif array.count = 3 and not (attached {FOCUS} array[3]) then
 			result := true
 		else
-			if attached{FOCUS} array[3] as f_obj then
-				result := f_obj.is_full
+			if attached{FOCUS} array[3] as focus_object then
+				result := focus_object.is_full
 			end
 		end
 	end
@@ -48,8 +47,8 @@ feature -- queries
 	do
 		if not attached {FOCUS} array[array.count] then
 			array.force (orbment, array.count + 1)
-		elseif attached {FOCUS} array[array.count] as f_obj and then not(f_obj.is_full) then
-			f_obj.add (orbment)
+		elseif attached {FOCUS} array[array.count] as focus_object and then not(focus_object.is_full) then
+			focus_object.add (orbment)
 		else
 			array.force (orbment, array.count + 1)
 
@@ -61,8 +60,8 @@ feature -- queries
 		across
 			array is o
 		loop
-			if attached o as o_d then
-				result := result + o_d.get_score
+			if attached o as orbment then
+				result := result + orbment.get_score
 			end
 		end
 		if array.count = 3 then

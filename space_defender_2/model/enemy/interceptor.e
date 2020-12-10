@@ -126,7 +126,11 @@ feature
 					end
 			else
 				if attached model.m.enemy_table.item (id) as cp then
-						model.m.enemy_act_display_str.append ("    "+cp.name+ "%N")
+					if old_location.row = location.row and old_location.column = location.column then
+							model.m.enemy_act_display_str.append ("    A "+name+"(id:"+id.out+") stays at: ["+model.m.row_indexes.item (old_location.row).out+","+(old_location.column).out+"]%N")
+					else
+							model.m.enemy_act_display_str.append ("    A Interceptor(id:"+id.out+") moves: ["+model.m.row_indexes.item (old_location.row).out+","+(old_location.column).out+"] -> out of board%N")
+					end
 				end
 
 			end
@@ -168,7 +172,11 @@ feature
 						model.m.enemy_act_display_str.append ("    A Interceptor(id:"+id.out+") moves: ["+model.m.row_indexes.item (old_location.row).out+","+(old_location.column).out+"] -> ["+model.m.row_indexes.item (location.row).out+","+location.column.out+"]%N")
 					end
 				else
-				--	model.m.enemy_act_display_str.append ("    A Interceptor(id:"+id.out+") moves: ["+model.m.row_indexes.item (old_location.row).out+","+(old_location.column).out+"] -> out of board%N")
+				if old_location.row = location.row and old_location.column = location.column then
+							model.m.enemy_act_display_str.append ("    A "+name+"(id:"+id.out+") stays at: ["+model.m.row_indexes.item (old_location.row).out+","+(old_location.column).out+"]%N")
+					else
+							model.m.enemy_act_display_str.append ("    A Interceptor(id:"+id.out+") moves: ["+model.m.row_indexes.item (old_location.row).out+","+(old_location.column).out+"] -> out of board%N")
+					end
 				end
 				model.m.enemy_act_display_str.append (model.m.e_act_collision_str)
 
@@ -200,13 +208,16 @@ feature
 						model.m.enemy_act_display_str.append ("    A Interceptor(id:"+id.out+") moves: ["+model.m.row_indexes.item (old_location.row).out+","+(old_location.column).out+"] -> ["+model.m.row_indexes.item (location.row).out+","+location.column.out+"]%N")
 					end
 				else
-				--	model.m.enemy_act_display_str.append ("    A Interceptor(id:"+id.out+") moves: ["+model.m.row_indexes.item (old_location.row).out+","+(old_location.column).out+"] -> out of board%N")
-
+					if old_location.row = location.row and old_location.column = location.column then
+							model.m.enemy_act_display_str.append ("    A "+name+"(id:"+id.out+") stays at: ["+model.m.row_indexes.item (old_location.row).out+","+(old_location.column).out+"]%N")
+					else
+							model.m.enemy_act_display_str.append ("    A Interceptor(id:"+id.out+") moves: ["+model.m.row_indexes.item (old_location.row).out+","+(old_location.column).out+"] -> out of board%N")
+					end
 				end
 				model.m.enemy_act_display_str.append (model.m.e_act_collision_str)
 			else
 				--STAYS
-				if location.row >= 1 and location.row <= model.m.board.height and (location.column >=1) and (location.column <= model.m.board.width) then
+				if old_location.row = location.row and old_location.column = location.column then
 					model.m.enemy_act_display_str.append ("    A Interceptor(id:"+id.out+") stays at: ["+model.m.row_indexes.item (old_location.row).out+","+(old_location.column).out+"]%N")
 				end
 			end

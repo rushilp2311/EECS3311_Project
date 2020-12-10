@@ -88,13 +88,14 @@ feature
 							model.m.sf_act_display_str.append ("      A friendly projectile(id:"+model.m.projectile_id.out+") spawns at location out of board.%N")
 							model.m.friendly_projectile_list.remove (fp.id)
 						end
-						model.m.decrement_projectile_id
-						model.m.calculate_fire_cost
+
+
 					else
 						model.m.sf_act_display_str.append ("      A friendly projectile(id:"+model.m.projectile_id.out+") spawns at location out of board.%N")
 						model.m.friendly_projectile_list.remove (fp.id)
 					end
 				end
+				model.m.decrement_projectile_id
 				model.m.friendly_projectile_list.extend (create{FRIENDLY_PROJECTILE}.make(model.m.projectile_id,model.m.ship.projectile_damage,1,[model.m.ship.location.row-1, model.m.ship.location.column+1]), model.m.projectile_id)
 				if attached model.m.friendly_projectile_list.item (model.m.projectile_id) as fp then
 					fp.id := model.m.projectile_id
@@ -109,13 +110,14 @@ feature
 							model.m.friendly_projectile_list.remove (fp.id)
 						end
 
-						model.m.decrement_projectile_id
-						model.m.calculate_fire_cost
+
+
 					else
 
 						model.m.friendly_projectile_list.remove (fp.id)
 					end
 				end
+				model.m.decrement_projectile_id
 				model.m.friendly_projectile_list.extend (create{FRIENDLY_PROJECTILE}.make(model.m.projectile_id,model.m.ship.projectile_damage,1,[model.m.ship.location.row+1, model.m.ship.location.column+1]), model.m.projectile_id)
 				if attached model.m.friendly_projectile_list.item (model.m.projectile_id) as fp then
 					fp.id := model.m.projectile_id
@@ -129,13 +131,14 @@ feature
 							model.m.sf_act_display_str.append ("      A friendly projectile(id:"+model.m.projectile_id.out+") spawns at location out of board.%N")
 							model.m.friendly_projectile_list.remove (fp.id)
 						end
-						model.m.decrement_projectile_id
-						model.m.calculate_fire_cost
+
 					else
 
 						model.m.friendly_projectile_list.remove (fp.id)
 					end
 				end
+				model.m.decrement_projectile_id
+				model.m.calculate_fire_cost
 		end
 	fire_snipe
 	local
@@ -171,38 +174,40 @@ feature
 						model.m.board.put ("*",fp.location.row, fp.location.column)
 						if fp.location.row >= 1 and fp.location.row <= model.m.board.height and fp.location.column >= 1 and fp.location.column <= model.m.board.width then
 							model.m.sf_act_display_str.append ("      A friendly projectile(id:"+model.m.projectile_id.out+") spawns at location ["+model.m.row_indexes.item (model.m.ship.location.row-1).out+","+(model.m.ship.location.column-1).out+"].%N")
+
 						else
 							model.m.sf_act_display_str.append ("      A friendly projectile(id:"+model.m.projectile_id.out+") spawns at location out of board.%N")
 							model.m.friendly_projectile_list.remove (fp.id)
 						end
-						model.m.decrement_projectile_id
-						model.m.calculate_fire_cost
+
+
 					else
 						model.m.sf_act_display_str.append ("      A friendly projectile(id:"+model.m.projectile_id.out+") spawns at location out of board.%N")
 						model.m.friendly_projectile_list.remove (fp.id)
 					end
 				end
-				
+
 			else
 				model.m.sf_act_display_str.append ("      A friendly projectile(id:"+model.m.projectile_id.out+") spawns at location out of board.%N")
 			end
 			model.m.decrement_projectile_id
+			
+
 			if (((model.m.ship.location.row + 1) <= model.m.board.height) and ((model.m.ship.location.row + 1) >= 1)) and (((model.m.ship.location.column - 1) <= model.m.board.width) and ((model.m.ship.location.column - 1) >= 1)) then
 				model.m.friendly_projectile_list.extend (create{FRIENDLY_PROJECTILE}.make(model.m.projectile_id,model.m.ship.projectile_damage,1,[model.m.ship.location.row-1, model.m.ship.location.column-1]), model.m.projectile_id)
 				if attached model.m.friendly_projectile_list.item (model.m.projectile_id) as fp then
 					fp.id := model.m.projectile_id
 					check_id := model.m.collision.check_for_collision ([model.m.ship.location.row+1, model.m.ship.location.column-1], fp.id, 0)
 					if fp.is_destroyed = false then
-						fp.location := [model.m.ship.location.row-1, model.m.ship.location.column+1]
+						fp.location := [model.m.ship.location.row+1, model.m.ship.location.column-1]
 						model.m.board.put ("*",fp.location.row, fp.location.column)
 						if fp.location.row >= 1 and fp.location.row <= model.m.board.height and fp.location.column >= 1 and fp.location.column <= model.m.board.width then
 							model.m.sf_act_display_str.append ("      A friendly projectile(id:"+model.m.projectile_id.out+") spawns at location ["+model.m.row_indexes.item (model.m.ship.location.row+1).out+","+(model.m.ship.location.column-1).out+"].%N")
+
 						else
 							model.m.sf_act_display_str.append ("      A friendly projectile(id:"+model.m.projectile_id.out+") spawns at location out of board.%N")
 							model.m.friendly_projectile_list.remove (fp.id)
 						end
-						model.m.decrement_projectile_id
-						model.m.calculate_fire_cost
 					else
 						model.m.sf_act_display_str.append ("      A friendly projectile(id:"+model.m.projectile_id.out+") spawns at location out of board.%N")
 						model.m.friendly_projectile_list.remove (fp.id)
